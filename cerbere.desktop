@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Cerbere
+Comment=Pantheon WatchDog
+Exec=cerbere
+Icon=
+Type=Application
