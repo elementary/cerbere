@@ -37,7 +37,7 @@ void on_watchdog_exit (Pid pid, int status, string name) {
 
 void on_launched_exit (Pid pid, int status, string name) {
     Process.close_pid (pid);
-    //GLib.log ("cerbere",GLib.LogLevelFlags.LEVEL_DEBUG, "%s exited with a status of %i\n".printf (name, status));
+    //message ("%s exited with a status of %i\n", name, status);
 }
 
 void watchdog_process (string bin_name) {
