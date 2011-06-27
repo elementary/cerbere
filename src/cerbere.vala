@@ -58,21 +58,9 @@ void launch_process (string bin_name) {
     //message ("%s %s childwatch added\n", bin_name, pidint.to_string ());
 }
 
-//void load_config (string path) {
 void load_config () {
-    /*var keyfile = new KeyFile ();
-    keyfile.load_from_file (path, KeyFileFlags.NONE);
-    var group = keyfile.get_start_group ();
-    var desk_comps = keyfile.get_value (group, "DesktopComponents").split_set (";", 0);
-    var keys = keyfile.get_keys (group);
-    foreach (string key in keys) {
-        if (key in desk_comps) {
-            desktop_bins += keyfile.get_value (group, key);
-        }
-    }*/
     var settings = new Settings ("org.elementary.cerbere.settings");
     desktop_bins = settings.get_strv ("desktop-components");
-
 }
 
 void start_desktop () {
@@ -96,9 +84,7 @@ namespace Cerbere {
         
         protected override void startup () {
             pids = new Gee.HashMap<string, int> ();
-            //load_config ("/usr/share/cerbere/cerbere.session");
             load_config ();
-
             start_desktop ();
             
             var main_loop = new MainLoop ();
