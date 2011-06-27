@@ -1,5 +1,0 @@
-[Pantheon Shell]
-DesktopComponents=background;dock;panel
-background=pantheon-wallpaper
-dock=plank
-panel=wingpanel

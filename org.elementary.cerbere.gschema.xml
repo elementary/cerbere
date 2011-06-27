@@ -1,0 +1,8 @@
+<schemalist>
+	<schema path="/apps/cerbere/settings/" id="org.gnome.cerbere.settings" gettext-domain="cerbere">
+            <key type="i" name="keyexample">
+              <default>1</default>
+              <summary>Example</summary>
+            </key>
+	</schema>
+</schemalist>
