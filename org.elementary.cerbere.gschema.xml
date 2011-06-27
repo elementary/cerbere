@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+    <schema path="/apps/cerbere/settings/" id="org.elementary.cerbere.settings" gettext-domain="cerbere">
+        <key type="as" name="desktop-components">
+            <default>['pantheon-wallpaper', 'wingpanel', 'plank']</default>
+            <summary>List of desktop components</summary>
+            <description>Thoses applications would be launched and watched by cerbere and autorestarted automagicly</description>
+        </key>
+	</schema>
+</schemalist>
