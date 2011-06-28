@@ -2,13 +2,13 @@
 
 find_package(Vala REQUIRED)
 include(ValaVersion)
-ensure_vala_version("0.11.3" MINIMUM)
+ensure_vala_version("0.10" MINIMUM)
 include(ValaPrecompile)
 
 
 # pkgconfig, real C code
 find_package(PkgConfig)
-pkg_check_modules(DEPS REQUIRED gtk+-3.0 glib-2.0 gee-1.0)
+pkg_check_modules(DEPS REQUIRED glib-2.0 gee-1.0)
 set(CFLAGS
 	${DEPS_CFLAGS} ${DEPS_CFLAGS_OTHER}
 )
