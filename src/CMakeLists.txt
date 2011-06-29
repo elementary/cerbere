@@ -8,7 +8,7 @@ include(ValaPrecompile)
 
 # pkgconfig, real C code
 find_package(PkgConfig)
-pkg_check_modules(DEPS REQUIRED glib-2.0 gee-1.0)
+pkg_check_modules(DEPS REQUIRED glib-2.0 gio-2.0 gee-1.0)
 set(CFLAGS
 	${DEPS_CFLAGS} ${DEPS_CFLAGS_OTHER}
 )
