@@ -13,7 +13,7 @@ Vcs-Browser: https://code.launchpad.net/~elementary-pantheon/cerbere/cerbere
 
 Package: cerbere
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, gsettings-backend
+Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: Pantheon WatchDog
  This package contains a watchdog daemon that launches Pantheon Shell components
  and relaunches them if they crash or get killed.
