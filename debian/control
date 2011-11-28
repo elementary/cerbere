@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 7.0.50~),
                libgee-dev (>= 0.5.3)
 Standards-Version: 3.8.4
 Vcs-Bzr: lp:cerbere
-Vcs-Browser: https://code.launchpad.net/~elementaryart/cerbere/cerbere
+Vcs-Browser: https://code.launchpad.net/~elementary-pantheon/cerbere/cerbere
 
 Package: cerbere
 Architecture: any
@@ -17,3 +17,15 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, gsettings-backend
 Description: Pantheon WatchDog
  This package contains a watchdog daemon that launches Pantheon Shell components
  and relaunches them if they crash or get killed.
+
+Package: cerbere-dbg
+Architecture: any
+Section: debug
+Priority: extra
+Depends: cerbere (= ${binary:Version}), ${misc:Depends}
+Enhances: cerbere
+Description: Pantheon WatchDog (debugging symbols)
+ This package contains a watchdog daemon that launches Pantheon Shell components
+ and relaunches them if they crash or get killed.
+ .
+ This package contains debugging symbols for cerbere.
