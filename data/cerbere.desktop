@@ -9,3 +9,4 @@ Categories=System
 NoDisplay=true
 X-GNOME-Autostart-Notify=false
 X-GNOME-AutoRestart=true
+X-GNOME-Autostart-Phase=Panel
