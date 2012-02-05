@@ -2,7 +2,7 @@
  * cerbere.vala
  * This file is part of cerbere
  *
- * Copyright (C) 2011 - Allen Lowe
+ * Copyright (C) 2011-2012 - Allen Lowe
  *
  * cerbere is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
