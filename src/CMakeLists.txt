@@ -19,7 +19,7 @@ link_directories(${LIB_PATHS})
 
 
 add_definitions(${CFLAGS})
-vala_precompile(VALA_C cerbere.vala
+vala_precompile(VALA_C Cerbere.vala Watchdog.vala ProcessTimer.vala
 PACKAGES
     glib-2.0
     gio-2.0
