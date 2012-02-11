@@ -4,7 +4,19 @@
         <key type="as" name="desktop-components">
             <default>['pantheon-wallpaper','wingpanel', 'gnome-settings-daemon', 'plank']</default>
             <summary>List of desktop components</summary>
-            <description>Thoses applications would be launched and watched by cerbere and autorestarted automagicly</description>
+            <description>These applications will be launched and watched by cerbere and autorestarted automagically</description>
         </key>
+
+        <key type="i" name="max-crashes">
+            <default>5</default>
+            <summary>Maximum permitted times to relaunch a process which crashes</summary>
+            <description>Maximum permitted times to relaunch a process which crashes. Cerbere will stop trying after this number is reached.</description>
+        </key>
+
+        <key type="d" name="crash-time">
+            <default>10.0</default>
+            <summary>Time in which a process is considered crashed</summary>
+            <description>(in seconds)</description>
+        </key>        
 	</schema>
 </schemalist>
