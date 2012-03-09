@@ -29,10 +29,10 @@ namespace Cerbere {
 
     public class Cerbere : Application {
 
-		private Watchdog watchdog;
+    private Watchdog watchdog;
 
-		private double crash_time;
-    	private int max_crashes;
+        private double crash_time;
+        private int max_crashes;
 
         private string[] desktop_bins;
 
@@ -44,8 +44,8 @@ namespace Cerbere {
         protected override void startup () {
             load_config ();
 
-			// Start watchdog
-			watchdog = new Watchdog (crash_time, max_crashes);
+            // Start watchdog
+            watchdog = new Watchdog (crash_time, max_crashes);
 
             start_desktop ();
 

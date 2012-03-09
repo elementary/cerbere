@@ -24,6 +24,8 @@
  *          Victor Eduardo <victoreduardm@gmail.com>
  */
 
+using GLib.Process;
+
 public class Watchdog {
 
     private double CRASH_TIME;
@@ -95,9 +97,7 @@ public class Watchdog {
             stdout.printf(" [CRASH #%i]", crashes);
         }
 
-        // Skip status check since it's causing problems
-        //if (status < 30 && crashes <= MAX_CRASHES)
-        if (crashes <= MAX_CRASHES)
+        if (crashes <= MAX_CRASHES && (if_exited (status) || if_signaled (status) || core_dump (status)))
             watch_process (name);
 
         if (crashes == MAX_CRASHES)
