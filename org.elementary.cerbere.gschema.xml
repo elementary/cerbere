@@ -2,7 +2,7 @@
 <schemalist>
     <schema path="/apps/cerbere/settings/" id="org.elementary.cerbere.settings" gettext-domain="cerbere">
         <key type="as" name="desktop-components">
-            <default>['pantheon-wallpaper','wingpanel','plank','/usr/lib/notify-osd/notify-osd']</default>
+            <default>['wingpanel','plank','/usr/lib/notify-osd/notify-osd']</default>
             <summary>List of desktop components</summary>
             <description>These applications will be launched and watched by cerbere and autorestarted automagically</description>
         </key>
