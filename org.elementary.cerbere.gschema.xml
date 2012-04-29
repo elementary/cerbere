@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-    <schema path="/apps/cerbere/settings/" id="org.elementary.cerbere.settings" gettext-domain="cerbere">
+    <schema path="/org/elementary/cerbere/settings/" id="org.elementary.cerbere.settings" gettext-domain="cerbere">
         <key type="as" name="desktop-components">
             <default>['wingpanel','plank','/usr/lib/notify-osd/notify-osd']</default>
             <summary>List of desktop components</summary>
