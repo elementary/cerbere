@@ -37,7 +37,7 @@ namespace Cerbere {
         private string[] desktop_bins;
 
         construct {
-            application_id = "org.elementary.cerbere";
+            application_id = "org.pantheon.cerbere";
             flags = GLib.ApplicationFlags.IS_SERVICE;
         }
 
@@ -54,7 +54,7 @@ namespace Cerbere {
         }
 
         void load_config () {
-            var settings = new Settings ("org.elementary.cerbere.settings");
+            var settings = new Settings ("org.pantheon.cerbere.settings");
             desktop_bins = settings.get_strv ("desktop-components");
             max_crashes = settings.get_int ("max-crashes");
             crash_time = settings.get_double ("crash-time");

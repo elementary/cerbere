@@ -14,4 +14,4 @@ add_subdirectory (data)
 
 # GSettings schema
 include(GSettings)
-add_schema("org.elementary.cerbere.gschema.xml")
+add_schema("org.pantheon.cerbere.gschema.xml")
