@@ -1,3 +1,4 @@
+/* -*- Mode: vala; indent-tabs-mode: nil; tab-width: 4 -*- */
 /*
  * Copyright (C) 2012 Victor Eduardo <victoreduardm@gmail.com>
  *
@@ -21,13 +22,13 @@
 
 public class SettingsManager : GLib.Object {
 
+    public signal void process_list_changed (string[] new_values);
+
     static const string SETTINGS_PATH = "org.pantheon.cerbere";
 
     static const string MAX_CRASHES_KEY = "max-crashes";
     static const string CRASH_TIME_INTERVAL_KEY = "crash-time-interval";
     static const string MONITORED_PROCESSES_KEY = "monitored-processes";
-
-    public signal void process_list_changed (string[] new_values);
 
     public string[] process_list   { get; set; }
     public uint max_crashes         { get; set; default = 0; }

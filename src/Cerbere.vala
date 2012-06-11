@@ -1,3 +1,4 @@
+/* -*- Mode: vala; indent-tabs-mode: nil; tab-width: 4 -*- */
 /*
  * Cerbere.vala
  * This file is part of cerbere, a watchdog for the Pantheon Desktop
@@ -39,7 +40,6 @@ public class Cerbere : GLib.Application {
 
         // Start watchdog
         this.watchdog = new Watchdog ();
-
         this.start_processes (this.settings.process_list);
 
         // Monitor changes
@@ -51,7 +51,7 @@ public class Cerbere : GLib.Application {
 
     private void start_processes (string[] process_list) {
         foreach (string cmd in process_list) {
-            watchdog.add_process_async (cmd);
+            this.watchdog.add_process_async (cmd);
         }
     }
 

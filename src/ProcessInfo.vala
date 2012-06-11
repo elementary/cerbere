@@ -1,3 +1,4 @@
+/* -*- Mode: vala; indent-tabs-mode: nil; tab-width: 4 -*- */
 /*
  * Copyright (C) 2012 Victor Eduardo <victoreduardm@gmail.com>
  *
@@ -35,12 +36,17 @@ public class ProcessInfo : GLib.Object {
 
     public Status status = Status.INACTIVE;
     public int exit_count { get; private set; default = 0; }
-    public int crash_count { get; set; default = 0; }
+    public int crash_count { get; private set; default = 0; }
 
     private GLib.Timer? timer = null;
 
     public ProcessInfo (string command) {
         this.command = command;
+    }
+
+    public void reset_crash_count () {
+        debug ("RESETTING crash count of '%s' to 0 (normal exit)", this.command);
+        this.crash_count = 0;
     }
 
     public async void run_async () {
@@ -50,11 +56,16 @@ public class ProcessInfo : GLib.Object {
     public void run () {
         message ("STARTING process: %s", command);
 
+        if (this.status == Status.RUNNING) {
+            message ("PROCESS %s is already running", command);
+            return;
+        }
+
         GLib.Pid process_id;
 
         var flags = GLib.SpawnFlags.SEARCH_PATH |
                      GLib.SpawnFlags.DO_NOT_REAP_CHILD |
-                     GLib.SpawnFlags.STDOUT_TO_DEV_NULL;
+                     GLib.SpawnFlags.STDOUT_TO_DEV_NULL; // discard process output
 
         // parse args
         string[] argvp = null;
@@ -118,8 +129,8 @@ public class ProcessInfo : GLib.Object {
             double ellapsed_secs = this.timer.elapsed ();
             double crash_time_interval_secs = (double)Cerbere.settings.crash_time_interval / 1000.0;
 
-            message ("Elapsed time = %f secs", ellapsed_secs);
-            message ("Min allowed time = %f secs", crash_time_interval_secs);
+            debug ("Elapsed time = %f secs", ellapsed_secs);
+            debug ("Min allowed time = %f secs", crash_time_interval_secs);
 
             if (ellapsed_secs <= crash_time_interval_secs) // process crashed
                 is_crash = true;
