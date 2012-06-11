@@ -1,22 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-    <schema path="/org/pantheon/cerbere/settings/" id="org.pantheon.cerbere.settings" gettext-domain="cerbere">
-        <key type="as" name="desktop-components">
+    <schema path="/org/pantheon/cerbere/" id="org.pantheon.cerbere" gettext-domain="cerbere">
+        <key type="as" name="monitored-processes">
             <default>['wingpanel','plank','/usr/lib/notify-osd/notify-osd']</default>
-            <summary>List of desktop components</summary>
-            <description>These applications will be launched and watched by cerbere and autorestarted automagically</description>
+            <summary>List of monitored components</summary>
+            <description>These applications will be launched and watched by Cerbere, and autorestarted automagically in case they exit</description>
         </key>
-
-        <key type="i" name="max-crashes">
+        <key type="u" name="max-crashes">
             <default>5</default>
-            <summary>Maximum permitted times to relaunch a process which crashes</summary>
-            <description>Maximum permitted times to relaunch a process which crashes. Cerbere will stop trying after this number is reached.</description>
+            <summary>Maximum consecutive crashes permitted</summary>
+            <description>Maximum consecutive crashes permitted. Cerbere will stop trying after this value is reached.</description>
         </key>
-
-        <key type="d" name="crash-time">
-            <default>10.0</default>
-            <summary>Time in which a process is considered crashed</summary>
-            <description>(in seconds)</description>
-        </key>        
+        <key type="u" name="crash-time-interval">
+            <default>10000</default>
+            <summary>Time in which a process is considered crashed (in milliseconds, 1/1000ths of a second)</summary>
+            <description>If a process is started and then it exits in less time than the value of this key, it is considered crashed.</description>
+        </key>
 	</schema>
 </schemalist>

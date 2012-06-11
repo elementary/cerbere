@@ -21,59 +21,42 @@
  *
  * Authors: Allen Lowe <allen@elementaryos.org>
  *          ammonkey <am.monkeyd@gmail.com>
+ *          Victor Eduardo <victoreduardm@gmail.com>
  */
 
-using GLib;
+public class Cerbere : GLib.Application {
 
-namespace Cerbere {
-
-    public class Cerbere : Application {
-
+    public static SettingsManager settings { get; private set; default = null; }
     private Watchdog watchdog;
 
-        private double crash_time;
-        private int max_crashes;
+    construct {
+        application_id = "org.pantheon.cerbere";
+        flags = GLib.ApplicationFlags.IS_SERVICE;
+    }
 
-        private string[] desktop_bins;
+    protected override void startup () {
+        this.settings = new SettingsManager ();
 
-        construct {
-            application_id = "org.pantheon.cerbere";
-            flags = GLib.ApplicationFlags.IS_SERVICE;
-        }
+        // Start watchdog
+        this.watchdog = new Watchdog ();
 
-        protected override void startup () {
-            load_config ();
+        this.start_processes (this.settings.process_list);
 
-            // Start watchdog
-            watchdog = new Watchdog (crash_time, max_crashes);
+        // Monitor changes
+        this.settings.process_list_changed.connect (this.start_processes);
 
-            start_desktop ();
+        var main_loop = new MainLoop ();
+        main_loop.run ();
+    }
 
-            var main_loop = new MainLoop ();
-            main_loop.run ();
-        }
-
-        void load_config () {
-            var settings = new Settings ("org.pantheon.cerbere.settings");
-            desktop_bins = settings.get_strv ("desktop-components");
-            max_crashes = settings.get_int ("max-crashes");
-            crash_time = settings.get_double ("crash-time");
-        }
-
-        void start_desktop () {
-            foreach (string bin in desktop_bins) {
-                if (bin != null) {
-                    watchdog.watch_process (bin);
-                }
-            }
-        }
-
-        public static int main (string[] args) {
-            var app = new Cerbere ();
-            app.run (args);
-
-            return 0;
+    private void start_processes (string[] process_list) {
+        foreach (string cmd in process_list) {
+            watchdog.add_process (cmd);
         }
     }
-}
 
+    public static int main (string[] args) {
+        var app = new Cerbere ();
+        return app.run (args);
+    }
+}

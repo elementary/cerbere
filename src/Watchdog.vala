@@ -24,84 +24,69 @@
  *          Victor Eduardo <victoreduardm@gmail.com>
  */
 
-using GLib.Process;
-
 public class Watchdog {
 
-    private double CRASH_TIME;
-    private int MAX_CRASHES;
+    private Gee.HashMap<string, ProcessInfo> processes;
 
-    private Gee.HashMap<string, int> pids;
-    private Gee.HashMap<string, ProcessTimer> run_time;
-    private Gee.HashMap<string, int> exit_count;
-    private Gee.HashMap<string, int> crash_count;
-
-    public Watchdog (double crash_time, int max_crashes) {
-        CRASH_TIME = crash_time;
-        MAX_CRASHES = max_crashes;
-        
-        pids = new Gee.HashMap<string, int> ();
-        run_time = new Gee.HashMap<string, ProcessTimer> ();
-        exit_count = new Gee.HashMap<string, int> ();
-        crash_count = new Gee.HashMap<string, int> ();
+    public Watchdog () {
+        this.processes = new Gee.HashMap<string, ProcessInfo> ();
     }
 
-    public void watch_process (string bin_name) {
-        Pid pid;
+    public void add_process (string command) {
+        if (is_white_space (command))
+            return;
 
-        try {
-            GLib.Process.spawn_async (null, {bin_name, null}, null, SpawnFlags.SEARCH_PATH | SpawnFlags.DO_NOT_REAP_CHILD | SpawnFlags.STDOUT_TO_DEV_NULL | SpawnFlags.STDERR_TO_DEV_NULL, null, out pid);
-        }
-        catch (GLib.Error err) {
-            warning (err.message);
-        }
+        string? args;
+        var bin_key = this.get_bin_key (command, out args);
 
-        stdout.printf("\nPROCESS STARTED:     [ID = %i]  %s", (int)pid, bin_name);
+        if (args == null)
+            args = "";
 
-        pids.set (bin_name, (int)pid);
+        // Check if a process for this bin has already been created
+        if (this.processes.has_key (bin_key))
+            return;
 
-        // Check if we have not created the counters before
+        // Create new process
+        var process = new ProcessInfo (bin_key);
+        process.run_async (args);
 
-        if (!exit_count.has_key(bin_name))
-            exit_count.set (bin_name, 0);
-
-        if (!crash_count.has_key(bin_name))
-            crash_count.set (bin_name, 0);
-
-        // Add and run timer
-        run_time.set(bin_name, new ProcessTimer());
-
-        ChildWatch.add (pid, (a,b) => {
-            on_process_exit (a, b, bin_name);
+        process.exited.connect ( (normal_exit) => {
+            if (!normal_exit && process.crash_count > Cerbere.settings.max_crashes)
+                return;
+            // Reload right away
+            process.run (args);
         });
+
+        processes[bin_key] = process;
     }
 
+    /**
+     * Returns the binary key from a command line string.
+     * For example:
+     * "slingshot --silent" => "slingshot"
+     *
+     * TODO: use GLib.Shell.parse_argv() instead
+     */
+    private string get_bin_key (string command, out string? args = null) {
+        string[] keys = command.split (" ", -1);
+        string rv = "";
 
-    private void on_process_exit (Pid pid, int status, string name) {
-        double elapsed_time = run_time.get(name).elapsed;
-        int exit_times = exit_count.get(name), crashes = crash_count.get(name);
-
-        stdout.printf("\nPROCESS TERMINATED:  [ID = %i]  %s [Status = %i]", (int)pid, name, status);
-        stdout.printf(" [Elapsed time = %.2fs]", elapsed_time);
-
-        exit_count.set(name, ++exit_times);
-        Process.close_pid (pid);
-
-        stdout.printf(" [Exit times = %i]", exit_times);
-
-        run_time.unset(name, null);
-        pids.unset (name, null);
-
-        if (elapsed_time <= CRASH_TIME) {
-            crash_count.set(name, ++crashes);
-            stdout.printf(" [CRASH #%i]", crashes);
+        int i = 0;
+        foreach (string key in keys) {
+            i += key.length;
+            if (!is_white_space (key)) {
+                rv = key;
+                break;
+            }
         }
 
-        if (crashes <= MAX_CRASHES && (if_exited (status) || if_signaled (status) || core_dump (status)))
-            watch_process (name);
+        args = command.substring (i - 1, command.length - 1);
 
-        if (crashes == MAX_CRASHES)
-            stdout.printf("\n\n-- Process '%s' crashed too many times. It won't be launched again.\n\n", name);
+        return rv;
+    }
+
+    private static bool is_white_space (string str) {
+        return str.strip () == "";
     }
 }
 
