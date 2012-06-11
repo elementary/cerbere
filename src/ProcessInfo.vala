@@ -30,27 +30,26 @@ public class ProcessInfo : GLib.Object {
         TERMINATED // killed/exited
     }
 
-    public string bin_name { get; private set; default = ""; }
+    public string command { get; private set; default = ""; }
     public GLib.Pid pid { get; private set; default = -1; }
 
     public Status status { get; private set; default = Status.INACTIVE; }
     public int exit_count { get; private set; default = 0; }
-    public int crash_count { get; private set; default = 0; }
+    public int crash_count { get; set; default = 0; }
 
     private GLib.Timer? timer = null;
 
-    public ProcessInfo (string bin_name) {
-        this.bin_name = bin_name;
+    public ProcessInfo (string command) {
+        this.command = command;
     }
 
-    public async void run_async (string args = "") {
-        GLib.Idle.add_full (GLib.Priority.HIGH_IDLE, () => {
-            this.run (args);
-            return false;
-        });
+    public async void run_async () {
+        this.run ();
     }
 
-    public void run (string args = "") {
+    public void run () {
+        message ("STARTING process: %s", command);
+
         GLib.Pid process_id;
 
         var flags = GLib.SpawnFlags.SEARCH_PATH |
@@ -59,14 +58,17 @@ public class ProcessInfo : GLib.Object {
                      GLib.SpawnFlags.STDERR_TO_DEV_NULL;
 
         // parse args
-        string[] argvp = new string[0];
+        string[] argvp = null;
         try {
-            GLib.Shell.parse_argv (this.bin_name + " " + args, out argvp);
+            GLib.Shell.parse_argv (this.command, out argvp);
         }
         catch (GLib.ShellError error) {
-            warning ("Not passing any args to %s : %s", this.bin_name, error.message);
-            argvp = {this.bin_name, null}; // fix value in case it's corrupted
+            warning ("Not passing any args to %s : %s", this.command, error.message);
+            argvp = {this.command, null}; // fix value in case it's corrupted
         }
+
+        if (argvp == null)
+            return;
 
         // Spawn process asynchronously
         try {
@@ -91,7 +93,7 @@ public class ProcessInfo : GLib.Object {
             if (pid != this.pid)
                 return;
 
-            message ("Process %s has been closed", bin_name);
+            message ("Process '%s' has been closed", command);
             // Check exit status
             if (GLib.Process.if_exited (status) || GLib.Process.if_signaled (status) ||
                 GLib.Process.core_dump (status))
@@ -105,7 +107,7 @@ public class ProcessInfo : GLib.Object {
         if (this.status != Status.RUNNING)
             return;
 
-        message ("Process %s is being terminated", bin_name);
+        message ("Process %s is being terminated", command);
 
         GLib.Process.close_pid (this.pid);
 
@@ -123,7 +125,7 @@ public class ProcessInfo : GLib.Object {
 
         if (is_crash) {
             this.crash_count ++;
-            message ("Process '%s' crashed", this.bin_name);
+            message ("Process '%s' crashed", this.command);
         }
 
         this.exit_count ++;

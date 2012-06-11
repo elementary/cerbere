@@ -21,7 +21,7 @@
 
 public class SettingsManager : GLib.Object {
 
-    private const string SETTINGS_PATH = "org.pantheon.cerbere.settings";
+    private const string SETTINGS_PATH = "org.pantheon.cerbere";
 
     private const string MAX_CRASHES_KEY = "max-crashes";
     private const string CRASH_TIME_INTERVAL_KEY = "crash-time-interval";
@@ -29,9 +29,9 @@ public class SettingsManager : GLib.Object {
 
     public signal void process_list_changed (string[] new_values);
 
-    public string[] process_list   { get; private set; }
-    public uint max_crashes         { get; private set; default = 0; }
-    public uint crash_time_interval { get; private set; default = 0; }
+    public string[] process_list   { get; set; }
+    public uint max_crashes         { get; set; default = 0; }
+    public uint crash_time_interval { get; set; default = 0; }
 
     private GLib.Settings? settings = null;
 

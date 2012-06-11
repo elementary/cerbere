@@ -33,60 +33,47 @@ public class Watchdog {
     }
 
     public void add_process (string command) {
-        if (is_white_space (command))
+        if (str.strip () == "") // whitespace check
             return;
 
-        string? args;
-        var bin_key = this.get_bin_key (command, out args);
-
-        if (args == null)
-            args = "";
-
-        // Check if a process for this bin has already been created
-        if (this.processes.has_key (bin_key))
+        // Check if a process for this has already been created
+        if (this.processes.has_key (command))
             return;
 
         // Create new process
-        var process = new ProcessInfo (bin_key);
-        process.run_async (args);
+        var process = new ProcessInfo (command);
 
+        // Add it to the table
+        processes[command] = process;
+
+        // Exit handler. Respawning occurs here
         process.exited.connect ( (normal_exit) => {
-            if (!normal_exit && process.crash_count > Cerbere.settings.max_crashes)
-                return;
-            // Reload right away
-            process.run (args);
+            if (normal_exit) {
+                // Reset crash count. We only want to count consecutive crashes, so if a normal exit
+                // is detected, we should reset the counter.
+                message ("RESETTING crash count of '%s'", command);
+                process.crash_count = 0;
+            }
+
+            // if still in the list, relaunch if possible
+            if (process in Cerbere.settings.process_list) {
+                // Check if the process already exceeded the maximum number of allowed crashes.
+                // Also check if the process is still present in the table since it could have been removed.
+                if (process.crash_count < Cerbere.settings.max_crashes && processes.has_key (command))
+                {
+                    message ("RELAUNCHING: %s", command);
+                    process.run (); // Reload right away
+                }
+            }
+            else {
+                // Remove from the list. At this point the reference count should
+                // drop to 0 and free the process.
+                processes.unset (command);
+            }
         });
 
-        processes[bin_key] = process;
-    }
-
-    /**
-     * Returns the binary key from a command line string.
-     * For example:
-     * "slingshot --silent" => "slingshot"
-     *
-     * TODO: use GLib.Shell.parse_argv() instead
-     */
-    private string get_bin_key (string command, out string? args = null) {
-        string[] keys = command.split (" ", -1);
-        string rv = "";
-
-        int i = 0;
-        foreach (string key in keys) {
-            i += key.length;
-            if (!is_white_space (key)) {
-                rv = key;
-                break;
-            }
-        }
-
-        args = command.substring (i - 1, command.length - 1);
-
-        return rv;
-    }
-
-    private static bool is_white_space (string str) {
-        return str.strip () == "";
+        // Run
+        process.run_async ();
     }
 }
 

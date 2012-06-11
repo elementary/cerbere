@@ -2,9 +2,8 @@
 
 find_package(Vala REQUIRED)
 include(ValaVersion)
-ensure_vala_version("0.10" MINIMUM)
+ensure_vala_version("0.14" MINIMUM)
 include(ValaPrecompile)
-
 
 # pkgconfig, real C code
 find_package(PkgConfig)
@@ -30,7 +29,7 @@ PACKAGES
     gio-2.0
     gee-1.0
 OPTIONS
-    --thread)
+    ${ADD_OPTIONS})
 
 add_executable(cerbere
     ${VALA_C} )
