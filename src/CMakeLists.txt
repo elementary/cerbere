@@ -29,6 +29,7 @@ PACKAGES
     gio-2.0
     gee-1.0
 OPTIONS
+    --target-glib=2.32
     ${ADD_OPTIONS})
 
 add_executable(cerbere

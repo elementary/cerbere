@@ -21,11 +21,11 @@
 
 public class SettingsManager : GLib.Object {
 
-    private const string SETTINGS_PATH = "org.pantheon.cerbere";
+    static const string SETTINGS_PATH = "org.pantheon.cerbere";
 
-    private const string MAX_CRASHES_KEY = "max-crashes";
-    private const string CRASH_TIME_INTERVAL_KEY = "crash-time-interval";
-    private const string MONITORED_PROCESSES_KEY = "monitored-processes";
+    static const string MAX_CRASHES_KEY = "max-crashes";
+    static const string CRASH_TIME_INTERVAL_KEY = "crash-time-interval";
+    static const string MONITORED_PROCESSES_KEY = "monitored-processes";
 
     public signal void process_list_changed (string[] new_values);
 

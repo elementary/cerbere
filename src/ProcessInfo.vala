@@ -22,7 +22,7 @@
 public class ProcessInfo : GLib.Object {
 
     public signal void exited (bool normal_exit);
-    public signal void started ();
+    //public signal void started ();
 
     public enum Status {
         INACTIVE,  // not yet spawned
@@ -30,10 +30,10 @@ public class ProcessInfo : GLib.Object {
         TERMINATED // killed/exited
     }
 
-    public string command { get; private set; default = ""; }
-    public GLib.Pid pid { get; private set; default = -1; }
+    private string command = "";
+    private GLib.Pid pid = -1;
 
-    public Status status { get; private set; default = Status.INACTIVE; }
+    public Status status = Status.INACTIVE;
     public int exit_count { get; private set; default = 0; }
     public int crash_count { get; set; default = 0; }
 
@@ -54,8 +54,7 @@ public class ProcessInfo : GLib.Object {
 
         var flags = GLib.SpawnFlags.SEARCH_PATH |
                      GLib.SpawnFlags.DO_NOT_REAP_CHILD |
-                     GLib.SpawnFlags.STDOUT_TO_DEV_NULL |
-                     GLib.SpawnFlags.STDERR_TO_DEV_NULL;
+                     GLib.SpawnFlags.STDOUT_TO_DEV_NULL;
 
         // parse args
         string[] argvp = null;
@@ -86,14 +85,14 @@ public class ProcessInfo : GLib.Object {
         this.status = Status.RUNNING;
 
         // Emit signal
-        this.started ();
+        //this.started ();
 
         // Add watch
         GLib.ChildWatch.add (this.pid, (pid, status) => {
             if (pid != this.pid)
                 return;
 
-            message ("Process '%s' has been closed", command);
+            message ("Process '%s' has been closed (ChildWatch exit)", command);
             // Check exit status
             if (GLib.Process.if_exited (status) || GLib.Process.if_signaled (status) ||
                 GLib.Process.core_dump (status))
@@ -116,10 +115,13 @@ public class ProcessInfo : GLib.Object {
         if (this.timer != null) {
             this.timer.stop ();
 
-            ulong t_microseconds = 0;
-            this.timer.elapsed (out t_microseconds);
+            double ellapsed_secs = this.timer.elapsed ();
+            double crash_time_interval_secs = (double)Cerbere.settings.crash_time_interval / 1000.0;
 
-            if (t_microseconds * 1000 <= Cerbere.settings.crash_time_interval) // process crashed
+            message ("Elapsed time = %f secs", ellapsed_secs);
+            message ("Min allowed time = %f secs", crash_time_interval_secs);
+
+            if (ellapsed_secs <= crash_time_interval_secs) // process crashed
                 is_crash = true;
         }
 

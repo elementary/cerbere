@@ -51,7 +51,7 @@ public class Cerbere : GLib.Application {
 
     private void start_processes (string[] process_list) {
         foreach (string cmd in process_list) {
-            watchdog.add_process (cmd);
+            watchdog.add_process_async (cmd);
         }
     }
 
