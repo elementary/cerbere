@@ -2,9 +2,8 @@
 
 find_package(Vala REQUIRED)
 include(ValaVersion)
-ensure_vala_version("0.10" MINIMUM)
+ensure_vala_version("0.14" MINIMUM)
 include(ValaPrecompile)
-
 
 # pkgconfig, real C code
 find_package(PkgConfig)
@@ -19,13 +18,19 @@ link_directories(${LIB_PATHS})
 
 
 add_definitions(${CFLAGS})
-vala_precompile(VALA_C Cerbere.vala Watchdog.vala ProcessTimer.vala
+vala_precompile (
+VALA_C
+    Cerbere.vala
+    SettingsManager.vala
+    Watchdog.vala
+    ProcessInfo.vala
 PACKAGES
     glib-2.0
     gio-2.0
     gee-1.0
 OPTIONS
-    --thread)
+    --target-glib=2.32
+    ${ADD_OPTIONS})
 
 add_executable(cerbere
     ${VALA_C} )

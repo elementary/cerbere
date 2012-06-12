@@ -1,3 +1,4 @@
+/* -*- Mode: vala; indent-tabs-mode: nil; tab-width: 4 -*- */
 /*
  * Watchdog.vala
  * This file is part of cerbere, a watchdog for the Pantheon Desktop
@@ -24,84 +25,74 @@
  *          Victor Eduardo <victoreduardm@gmail.com>
  */
 
-using GLib.Process;
-
 public class Watchdog {
+    // Contains ALL the processes that are being monitored
+    private Gee.HashMap<string, ProcessInfo> processes;
+    private GLib.Mutex data_lock;
 
-    private double CRASH_TIME;
-    private int MAX_CRASHES;
-
-    private Gee.HashMap<string, int> pids;
-    private Gee.HashMap<string, ProcessTimer> run_time;
-    private Gee.HashMap<string, int> exit_count;
-    private Gee.HashMap<string, int> crash_count;
-
-    public Watchdog (double crash_time, int max_crashes) {
-        CRASH_TIME = crash_time;
-        MAX_CRASHES = max_crashes;
-        
-        pids = new Gee.HashMap<string, int> ();
-        run_time = new Gee.HashMap<string, ProcessTimer> ();
-        exit_count = new Gee.HashMap<string, int> ();
-        crash_count = new Gee.HashMap<string, int> ();
+    public Watchdog () {
+        this.processes = new Gee.HashMap<string, ProcessInfo> ();
     }
 
-    public void watch_process (string bin_name) {
-        Pid pid;
+    public async void add_process_async (string command) {
+        this.add_process (command);
+    }
 
-        try {
-            GLib.Process.spawn_async (null, {bin_name, null}, null, SpawnFlags.SEARCH_PATH | SpawnFlags.DO_NOT_REAP_CHILD | SpawnFlags.STDOUT_TO_DEV_NULL | SpawnFlags.STDERR_TO_DEV_NULL, null, out pid);
-        }
-        catch (GLib.Error err) {
-            warning (err.message);
-        }
+    public void add_process (string command) {
+        if (command.strip () == "") // whitespace check
+            return;
 
-        stdout.printf("\nPROCESS STARTED:     [ID = %i]  %s", (int)pid, bin_name);
+        // Check if a process for this command has already been created
+        if (this.processes.has_key (command))
+            return;
 
-        pids.set (bin_name, (int)pid);
+        // Create new process
+        var process = new ProcessInfo (command);
 
-        // Check if we have not created the counters before
+        // Add it to the table
+        this.data_lock.lock ();
+        this.processes[command] = process;
+        this.data_lock.unlock ();
 
-        if (!exit_count.has_key(bin_name))
-            exit_count.set (bin_name, 0);
+        // Exit handler. Respawning occurs here
+        process.exited.connect ( (normal_exit) => {
+            if (normal_exit) {
+                // Reset crash count. We only want to count consecutive crashes, so if a normal exit
+                // is detected, we should reset the counter.
+                process.reset_crash_count ();
+            }
 
-        if (!crash_count.has_key(bin_name))
-            crash_count.set (bin_name, 0);
-
-        // Add and run timer
-        run_time.set(bin_name, new ProcessTimer());
-
-        ChildWatch.add (pid, (a,b) => {
-            on_process_exit (a, b, bin_name);
+            // if still in the list, relaunch if possible
+            if (command in Cerbere.settings.process_list) {
+                // Check if the process is still present in the table since it could have been removed.
+                if (processes.has_key (command)) {
+                    // Check if the process already exceeded the maximum number of allowed crashes.
+                    uint max_crashes = Cerbere.settings.max_crashes;
+                    if (process.crash_count <= max_crashes) {
+                        message ("RELAUNCHING: %s", command);
+                        process.run (); // Reload right away
+                    }
+                    else {
+                        message ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again", command, max_crashes.to_string ());
+                    }
+                }
+                else {
+                    // If a process is not in the table, it means it wasn't re-launched after it exited, so
+                    // in theory this code is never reached.
+                    message ("You should NEVER get this message. If you're getting it, contact the developers.");
+                }
+            }
+            else {
+                // Remove from the list. At this point the reference count should
+                // drop to 0 and free the process.
+                message ("'%s' is no longer on settings. It will not be monitored anymore", command);
+                this.data_lock.lock ();
+                this.processes.unset (command);
+                this.data_lock.unlock ();
+            }
         });
-    }
 
-
-    private void on_process_exit (Pid pid, int status, string name) {
-        double elapsed_time = run_time.get(name).elapsed;
-        int exit_times = exit_count.get(name), crashes = crash_count.get(name);
-
-        stdout.printf("\nPROCESS TERMINATED:  [ID = %i]  %s [Status = %i]", (int)pid, name, status);
-        stdout.printf(" [Elapsed time = %.2fs]", elapsed_time);
-
-        exit_count.set(name, ++exit_times);
-        Process.close_pid (pid);
-
-        stdout.printf(" [Exit times = %i]", exit_times);
-
-        run_time.unset(name, null);
-        pids.unset (name, null);
-
-        if (elapsed_time <= CRASH_TIME) {
-            crash_count.set(name, ++crashes);
-            stdout.printf(" [CRASH #%i]", crashes);
-        }
-
-        if (crashes <= MAX_CRASHES && (if_exited (status) || if_signaled (status) || core_dump (status)))
-            watch_process (name);
-
-        if (crashes == MAX_CRASHES)
-            stdout.printf("\n\n-- Process '%s' crashed too many times. It won't be launched again.\n\n", name);
+        // Run
+        process.run_async ();
     }
 }
-
