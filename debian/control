@@ -6,7 +6,7 @@ Build-Depends: cmake (>= 2.6),
                debhelper (>= 7.0.50~),
                libgee-dev (>= 0.5.3),
                libglib2.0-dev (>= 2.28),
-               valac (>= 0.10)
+               valac-0.16 | valac (>= 0.16)
 Standards-Version: 3.8.4
 Vcs-Bzr: lp:cerbere
 Vcs-Browser: https://code.launchpad.net/~elementary-pantheon/cerbere/cerbere
