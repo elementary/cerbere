@@ -12,9 +12,9 @@
             <description>Maximum consecutive crashes permitted. Cerbere will stop trying after this value is reached.</description>
         </key>
         <key type="u" name="crash-time-interval">
-            <default>10000</default>
+            <default>3500</default>
             <summary>Time in which a process is considered crashed (in milliseconds, 1/1000ths of a second)</summary>
             <description>If a process is started, and then it exits in less time than the value of this key, it is considered crashed.</description>
         </key>
-	</schema>
+    </schema>
 </schemalist>
