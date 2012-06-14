@@ -20,10 +20,9 @@
  * Authors: Victor Eduardo <victoreduardm@gmail.com>
  */
 
-public class ProcessInfo : GLib.Object {
+public class ProcessInfo : Object {
 
     public signal void exited (bool normal_exit);
-    //public signal void started ();
 
     public enum Status {
         INACTIVE,  // not yet spawned
@@ -31,48 +30,42 @@ public class ProcessInfo : GLib.Object {
         TERMINATED // killed/exited
     }
 
-    private string command = "";
-    private GLib.Pid pid = -1;
-
-    public Status status = Status.INACTIVE;
-    public int exit_count { get; private set; default = 0; }
     public int crash_count { get; private set; default = 0; }
 
-    private GLib.Timer? timer = null;
+    private string command = "";
+    private Pid pid = -1;
+    private Status status = Status.INACTIVE;
+    private Timer? timer = null;
 
     public ProcessInfo (string command) {
         this.command = command;
     }
 
     public void reset_crash_count () {
-        debug ("RESETTING crash count of '%s' to 0 (normal exit)", this.command);
         this.crash_count = 0;
+        debug ("Crash count of '%s' has been reset", this.command);
     }
 
     public async void run_async () {
         this.run ();
     }
 
-    public void run () {
+    private void run () {
         message ("STARTING process: %s", command);
 
         if (this.status == Status.RUNNING) {
-            message ("PROCESS %s is already running", command);
+            message ("Process %s is already running", command);
             return;
         }
 
-        GLib.Pid process_id;
-
-        var flags = GLib.SpawnFlags.SEARCH_PATH |
-                     GLib.SpawnFlags.DO_NOT_REAP_CHILD |
-                     GLib.SpawnFlags.STDOUT_TO_DEV_NULL; // discard process output
+        Pid process_id = -1;
 
         // parse args
         string[] argvp = null;
         try {
-            GLib.Shell.parse_argv (this.command, out argvp);
+            Shell.parse_argv (this.command, out argvp);
         }
-        catch (GLib.ShellError error) {
+        catch (ShellError error) {
             warning ("Not passing any args to %s : %s", this.command, error.message);
             argvp = {this.command, null}; // fix value in case it's corrupted
         }
@@ -82,46 +75,50 @@ public class ProcessInfo : GLib.Object {
 
         // Spawn process asynchronously
         try {
-            GLib.Process.spawn_async (null, argvp, null, flags, null, out process_id);
+            var flags = SpawnFlags.SEARCH_PATH |
+                         SpawnFlags.DO_NOT_REAP_CHILD |
+                         SpawnFlags.STDOUT_TO_DEV_NULL; // discard process output
+
+            Process.spawn_async (null, argvp, null, flags, null, out process_id);
         }
-        catch (GLib.Error err) {
+        catch (Error err) {
+            // TODO: Discuss how to handle spawn failures. Currently, Cerbere will give up
+            // and stop trying. We could, however, add a call to terminate() in order to let the
+            // Watchdog try again.
             warning (err.message);
             return;
         }
 
         // time starts counting here
-        this.timer = new GLib.Timer ();
-
-        this.pid = process_id;
+        this.timer = new Timer ();
         this.status = Status.RUNNING;
-
-        // Emit signal
-        //this.started ();
+        this.pid = process_id;
 
         // Add watch
-        GLib.ChildWatch.add (this.pid, (pid, status) => {
-            if (pid != this.pid)
-                return;
-
-            message ("Process '%s' has been closed (ChildWatch exit)", command);
-            // Check exit status
-            if (GLib.Process.if_exited (status) || GLib.Process.if_signaled (status) ||
-                GLib.Process.core_dump (status))
-            {
-                this.terminate ();
-            }
-        });
+        ChildWatch.add (this.pid, this.on_process_watch_exit);
     }
 
-    public void terminate () {
+    private void on_process_watch_exit (Pid pid, int status) {
+        if (pid != this.pid)
+            return;
+
+        message ("Process '%s' exited", command);
+
+        // Check exit status
+        if (Process.if_exited (status) || Process.if_signaled (status) || Process.core_dump (status)) {
+            this.terminate ();
+        }
+    }
+
+    private void terminate () {
         if (this.status != Status.RUNNING)
             return;
 
         message ("Process %s is being terminated", command);
 
-        GLib.Process.close_pid (this.pid);
+        Process.close_pid (this.pid);
 
-        bool is_crash = false;
+        bool normal_exit = true;
 
         if (this.timer != null) {
             this.timer.stop ();
@@ -132,21 +129,19 @@ public class ProcessInfo : GLib.Object {
             debug ("Elapsed time = %f secs", ellapsed_secs);
             debug ("Min allowed time = %f secs", crash_time_interval_secs);
 
-            if (ellapsed_secs <= crash_time_interval_secs) // process crashed
-                is_crash = true;
+            if (ellapsed_secs <= crash_time_interval_secs) { // process crashed
+                this.crash_count ++;
+                normal_exit = false;
+                message ("PROCESS '%s' CRASHED (#%i)", this.command, this.crash_count);
+            }
+
+            // Remove the current timer
+            this.timer = null;
         }
 
-        if (is_crash) {
-            this.crash_count ++;
-            message ("Process '%s' crashed", this.command);
-        }
-
-        this.exit_count ++;
         this.status = Status.TERMINATED;
 
-        this.timer = null;
-
         // Emit signal
-        this.exited (!is_crash);
-    }   
+        this.exited (normal_exit);
+    }
 }

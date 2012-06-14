@@ -28,7 +28,7 @@
 public class Watchdog {
     // Contains ALL the processes that are being monitored
     private Gee.HashMap<string, ProcessInfo> processes;
-    private GLib.Mutex data_lock;
+    private Mutex data_lock;
 
     public Watchdog () {
         this.processes = new Gee.HashMap<string, ProcessInfo> ();
@@ -38,7 +38,7 @@ public class Watchdog {
         this.add_process (command);
     }
 
-    public void add_process (string command) {
+    private void add_process (string command) {
         if (command.strip () == "") // whitespace check
             return;
 
@@ -68,25 +68,26 @@ public class Watchdog {
                 if (processes.has_key (command)) {
                     // Check if the process already exceeded the maximum number of allowed crashes.
                     uint max_crashes = Cerbere.settings.max_crashes;
+
                     if (process.crash_count <= max_crashes) {
-                        message ("RELAUNCHING: %s", command);
-                        process.run (); // Reload right away
+                        process.run_async (); // Reload right away
                     }
                     else {
-                        message ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again", command, max_crashes.to_string ());
+                        message ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again",
+                                 command, max_crashes.to_string ());
                     }
                 }
                 else {
                     // If a process is not in the table, it means it wasn't re-launched after it exited, so
                     // in theory this code is never reached.
-                    message ("You should NEVER get this message. If you're getting it, contact the developers.");
+                    warning ("You should NEVER get this message. If you're getting it, file a bug!");
                 }
             }
             else {
-                // Remove from the list. At this point the reference count should
-                // drop to 0 and free the process.
+                // Remove from the list. At this point the reference count should drop to 0 and free the process.
                 message ("'%s' is no longer on settings. It will not be monitored anymore", command);
                 this.data_lock.lock ();
+                process.reset_crash_count (); // reset
                 this.processes.unset (command);
                 this.data_lock.unlock ();
             }

@@ -25,24 +25,22 @@
  *          Victor Eduardo <victoreduardm@gmail.com>
  */
 
-public class Cerbere : GLib.Application {
+public class Cerbere : Application {
 
     public static SettingsManager settings { get; private set; default = null; }
     private Watchdog watchdog;
 
     construct {
         application_id = "org.pantheon.cerbere";
-        flags = GLib.ApplicationFlags.IS_SERVICE;
+        flags = ApplicationFlags.IS_SERVICE;
     }
 
     protected override void startup () {
         this.settings = new SettingsManager ();
 
-        // Start watchdog
-        this.watchdog = new Watchdog ();
         this.start_processes (this.settings.process_list);
 
-        // Monitor changes
+        // Monitor changes to the process list
         this.settings.process_list_changed.connect (this.start_processes);
 
         var main_loop = new MainLoop ();
@@ -50,6 +48,10 @@ public class Cerbere : GLib.Application {
     }
 
     private void start_processes (string[] process_list) {
+        if (this.watchdog == null) {
+            this.watchdog = new Watchdog ();
+        }
+
         foreach (string cmd in process_list) {
             this.watchdog.add_process_async (cmd);
         }

@@ -20,7 +20,7 @@
  * Authors: Victor Eduardo <victoreduardm@gmail.com>
  */
 
-public class SettingsManager : GLib.Object {
+public class SettingsManager : Object {
 
     public signal void process_list_changed (string[] new_values);
 
@@ -34,10 +34,10 @@ public class SettingsManager : GLib.Object {
     public uint max_crashes         { get; set; default = 0; }
     public uint crash_time_interval { get; set; default = 0; }
 
-    private GLib.Settings? settings = null;
+    private Settings? settings = null;
 
     public SettingsManager () {
-        this.settings = new GLib.Settings (SETTINGS_PATH);
+        this.settings = new Settings (SETTINGS_PATH);
 
         this.settings.bind (MAX_CRASHES_KEY, this, "max-crashes", SettingsBindFlags.DEFAULT);
         this.settings.bind (CRASH_TIME_INTERVAL_KEY, this, "crash-time-interval", SettingsBindFlags.DEFAULT);
