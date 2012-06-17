@@ -84,10 +84,12 @@ public class Watchdog {
                 }
             }
             else {
-                // Remove from the list. At this point the reference count should drop to 0 and free the process.
                 message ("'%s' is no longer on settings. It will not be monitored anymore", command);
-                this.data_lock.lock ();
+
                 process.reset_crash_count (); // reset
+
+                // Remove from the list. At this point the reference count should drop to 0 and free the process.
+                this.data_lock.lock ();
                 this.processes.unset (command);
                 this.data_lock.unlock ();
             }

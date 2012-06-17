@@ -30,7 +30,7 @@ public class ProcessInfo : Object {
         TERMINATED // killed/exited
     }
 
-    public int crash_count { get; private set; default = 0; }
+    public uint crash_count { get; private set; default = 0; }
 
     private string command = "";
     private Pid pid = -1;
@@ -123,13 +123,13 @@ public class ProcessInfo : Object {
         if (this.timer != null) {
             this.timer.stop ();
 
-            double ellapsed_secs = this.timer.elapsed ();
+            double elapsed_secs = this.timer.elapsed ();
             double crash_time_interval_secs = (double)Cerbere.settings.crash_time_interval / 1000.0;
 
-            debug ("Elapsed time = %f secs", ellapsed_secs);
+            debug ("Elapsed time = %f secs", elapsed_secs);
             debug ("Min allowed time = %f secs", crash_time_interval_secs);
 
-            if (ellapsed_secs <= crash_time_interval_secs) { // process crashed
+            if (elapsed_secs <= crash_time_interval_secs) { // process crashed
                 this.crash_count ++;
                 normal_exit = false;
                 message ("PROCESS '%s' CRASHED (#%i)", this.command, this.crash_count);
