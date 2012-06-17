@@ -132,7 +132,7 @@ public class ProcessInfo : Object {
             if (elapsed_secs <= crash_time_interval_secs) { // process crashed
                 this.crash_count ++;
                 normal_exit = false;
-                message ("PROCESS '%s' CRASHED (#%i)", this.command, this.crash_count);
+                message ("PROCESS '%s' CRASHED (#%u)", this.command, this.crash_count);
             }
 
             // Remove the current timer
