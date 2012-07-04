@@ -62,6 +62,8 @@ public class Watchdog {
                 process.reset_crash_count ();
             }
 
+            bool remove_process = false;
+
             // if still in the list, relaunch if possible
             if (command in Cerbere.settings.process_list) {
                 // Check if the process is still present in the table since it could have been removed.
@@ -75,6 +77,7 @@ public class Watchdog {
                     else {
                         message ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again",
                                  command, max_crashes.to_string ());
+                        remove_process = true;
                     }
                 }
                 else {
@@ -85,10 +88,13 @@ public class Watchdog {
             }
             else {
                 message ("'%s' is no longer on settings. It will not be monitored anymore", command);
-
                 process.reset_crash_count (); // reset
+                remove_process = true;
+            }
 
-                // Remove from the list. At this point the reference count should drop to 0 and free the process.
+            // Remove from the table. At this point the reference count should
+            // drop to 0 and free the process info.
+            if (remove_process) {
                 this.data_lock.lock ();
                 this.processes.unset (command);
                 this.data_lock.unlock ();
