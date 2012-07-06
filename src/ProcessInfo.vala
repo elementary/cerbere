@@ -43,7 +43,7 @@ public class ProcessInfo : Object {
 
     public void reset_crash_count () {
         this.crash_count = 0;
-        debug ("Crash count of '%s' has been reset", this.command);
+        message ("Crash count of '%s' has been reset", this.command);
     }
 
     public async void run_async () {
@@ -51,10 +51,10 @@ public class ProcessInfo : Object {
     }
 
     private void run () {
-        message ("STARTING process: %s", command);
+        debug ("STARTING process: %s", command);
 
         if (this.status == Status.RUNNING) {
-            message ("Process %s is already running", command);
+            warning ("Process %s is already running. Not starting it again...", command);
             return;
         }
 
@@ -102,7 +102,7 @@ public class ProcessInfo : Object {
         if (pid != this.pid)
             return;
 
-        message ("Process '%s' exited", command);
+        message ("Process '%s' watch exit", command);
 
         // Check exit status
         if (Process.if_exited (status) || Process.if_signaled (status) || Process.core_dump (status)) {
@@ -126,13 +126,12 @@ public class ProcessInfo : Object {
             double elapsed_secs = this.timer.elapsed ();
             double crash_time_interval_secs = (double)Cerbere.settings.crash_time_interval / 1000.0;
 
-            debug ("Elapsed time = %f secs", elapsed_secs);
-            debug ("Min allowed time = %f secs", crash_time_interval_secs);
+            message ("ET = %f secs\tMin allowed time = %f", elapsed_secs, crash_time_interval_secs);
 
             if (elapsed_secs <= crash_time_interval_secs) { // process crashed
                 this.crash_count ++;
                 normal_exit = false;
-                message ("PROCESS '%s' CRASHED (#%u)", this.command, this.crash_count);
+                warning ("PROCESS '%s' CRASHED (#%u)", this.command, this.crash_count);
             }
 
             // Remove the current timer

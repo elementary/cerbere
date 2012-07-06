@@ -30,7 +30,7 @@ public class SettingsManager : Object {
     static const string CRASH_TIME_INTERVAL_KEY = "crash-time-interval";
     static const string MONITORED_PROCESSES_KEY = "monitored-processes";
 
-    public string[] process_list   { get; set; }
+    public string[] process_list    { get; set; }
     public uint max_crashes         { get; set; default = 0; }
     public uint crash_time_interval { get; set; default = 0; }
 
@@ -47,6 +47,6 @@ public class SettingsManager : Object {
     }
 
     private void on_process_list_changed () {
-        this.process_list_changed (this.settings.get_strv (MONITORED_PROCESSES_KEY));
+        this.process_list_changed (this.process_list);
     }
 }

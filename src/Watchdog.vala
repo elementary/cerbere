@@ -25,10 +25,10 @@
  *          Victor Eduardo <victoreduardm@gmail.com>
  */
 
-public class Watchdog {
+public class Watchdog : Object {
+
     // Contains ALL the processes that are being monitored
     private Gee.HashMap<string, ProcessInfo> processes;
-    private Mutex data_lock;
 
     public Watchdog () {
         this.processes = new Gee.HashMap<string, ProcessInfo> ();
@@ -43,16 +43,17 @@ public class Watchdog {
             return;
 
         // Check if a process for this command has already been created
-        if (this.processes.has_key (command))
+        if (this.processes.has_key (command)) {
             return;
+        }
 
         // Create new process
         var process = new ProcessInfo (command);
 
         // Add it to the table
-        this.data_lock.lock ();
-        this.processes[command] = process;
-        this.data_lock.unlock ();
+        lock (this.processes) {
+            this.processes[command] = process;
+        }
 
         // Exit handler. Respawning occurs here
         process.exited.connect ( (normal_exit) => {
@@ -75,19 +76,18 @@ public class Watchdog {
                         process.run_async (); // Reload right away
                     }
                     else {
-                        message ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again",
-                                 command, max_crashes.to_string ());
+                        warning ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again", command, max_crashes.to_string ());
                         remove_process = true;
                     }
                 }
                 else {
-                    // If a process is not in the table, it means it wasn't re-launched after it exited, so
-                    // in theory this code is never reached.
-                    warning ("You should NEVER get this message. If you're getting it, file a bug!");
+                    // If a process is not in the table, it means it wasn't re-launched
+                    // after it exited, so in theory this code is never reached.
+                    critical ("Please file a bug at http://launchpad.net/cerbere and attach your ~/.xsession-errors file.");
                 }
             }
             else {
-                message ("'%s' is no longer on settings. It will not be monitored anymore", command);
+                warning ("'%s' is no longer in settings (not monitored))", command);
                 process.reset_crash_count (); // reset
                 remove_process = true;
             }
@@ -95,9 +95,9 @@ public class Watchdog {
             // Remove from the table. At this point the reference count should
             // drop to 0 and free the process info.
             if (remove_process) {
-                this.data_lock.lock ();
-                this.processes.unset (command);
-                this.data_lock.unlock ();
+                lock (this.processes) {
+                    this.processes.unset (command);
+                }
             }
         });
 

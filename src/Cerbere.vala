@@ -28,23 +28,55 @@
 public class Cerbere : Application {
 
     public static SettingsManager settings { get; private set; default = null; }
-    private Watchdog watchdog;
+    private Watchdog? watchdog = null;
+    private SessionManager.ClientService? sm_client = null;
 
     construct {
         application_id = "org.pantheon.cerbere";
         flags = ApplicationFlags.IS_SERVICE;
+        Log.set_handler (null, LogLevelFlags.LEVEL_MASK, log_handler);
+    }
+
+    private static void log_handler (string? domain, LogLevelFlags level, string message) {
+        if (level >= LogLevelFlags.LEVEL_INFO)
+            level = LogLevelFlags.LEVEL_MESSAGE;
+        Log.default_handler (domain, level, message);
     }
 
     protected override void startup () {
-        this.settings = new SettingsManager ();
+        // Try to register Cerbere with the session manager.
+        // This is a non-blocking action.
+        register_session_client_async ();
 
-        this.start_processes (this.settings.process_list);
+        this.settings = new SettingsManager ();
+        start_processes (this.settings.process_list);
 
         // Monitor changes to the process list
         this.settings.process_list_changed.connect (this.start_processes);
 
         var main_loop = new MainLoop ();
         main_loop.run ();
+    }
+
+    private async void register_session_client_async () {
+        if (this.sm_client != null)
+            return;
+
+        this.sm_client = new SessionManager.ClientService (this.application_id);
+
+        try {
+            this.sm_client.register ();
+        } catch (SessionManager.ConnectionError e) {
+            critical (e.message);
+        }
+
+        if (this.sm_client != null) {
+            // The session manager may ask us to quit the service, and so we do.
+            this.sm_client.stop_service.connect ( () => {
+                message ("Exiting...");
+                this.quit_mainloop ();
+            });
+        }
     }
 
     private void start_processes (string[] process_list) {
