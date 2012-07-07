@@ -42,7 +42,7 @@ namespace SessionManager {
     private interface SessionManager : Object {
         // Many API methods have been left out. Feel free to add them when required.
         public abstract void RegisterClient (string app_id, string client_startup_id,
-                                             out string client_id) throws IOError;
+                                             out ObjectPath client_id) throws IOError;
         public abstract void UnregisterClient (ObjectPath client_id) throws IOError;
     }
 
@@ -68,8 +68,8 @@ namespace SessionManager {
 
         private SessionManager? session_manager = null;
         private ClientPrivate? client = null;
-        private string? client_id = null;
-        private string? app_id = null;
+        private ObjectPath? client_id = null;
+        public string? app_id { get; private set; default = null; }
 
         public ClientService (string app_id) {
             this.app_id = app_id;
@@ -86,14 +86,23 @@ namespace SessionManager {
                 }
             }
 
-            connected = register_client ();
+            // NOTE: if you're planning to use this code in other app, pass your app's name
+            //       to register_client() instead of the value of DESKTOP_AUTOSTART_ID,
+            //       unless the app is a desktop component as well (e.g. panel, dock, etc.)
+            string? startup_id = Environment.get_variable ("DESKTOP_AUTOSTART_ID");
+
+            if (startup_id == null) {
+                critical ("Could not get value of environment variable DESKTOP_AUTOSTART_ID");
+                startup_id = app_id;
+            }
+
+            connected = register_client (startup_id);
 
             if (!connected) {
                 // Disconnect from SM
                 session_manager = null;
                 throw new ConnectionError.CLIENT_REGISTRATION_FAILED ("Unable to register client with session manager");
             }
-
         }
 
         public void unregister () {
@@ -102,7 +111,7 @@ namespace SessionManager {
             debug ("Unregistering client: %s", client_id);
 
             try {
-                session_manager.UnregisterClient (new ObjectPath (client_id));
+                session_manager.UnregisterClient (client_id);
             } catch (IOError e) {
                 critical (e.message);
             }
@@ -120,15 +129,8 @@ namespace SessionManager {
             return session_manager != null;
         }
 
-        private bool register_client () {
+        private bool register_client (string startup_id) {
             return_val_if_fail (session_manager != null && app_id != null, false);
-
-            string? startup_id = Environment.get_variable ("DESKTOP_AUTOSTART_ID");
-
-            if (startup_id == null) {
-                critical ("Could not get value of environment variable DESKTOP_AUTOSTART_ID");
-                return false;
-            }
 
             // Register client
             if (client == null) {
@@ -177,29 +179,35 @@ namespace SessionManager {
             return_if_fail (client != null);
 
             send_end_session_response (true);
-            on_client_stop ();
         }
 
         private void on_client_cancel_end_session () {
             debug ("Client: Received EndSessionCanceled signal");
+            // There's nothing we should do here
         }
 
         private void on_client_stop () {
             debug ("Client: Received Stop signal");
-            this.unregister ();
-            this.stop_service ();
+            terminate_service ();
         }
 
-        private inline void send_end_session_response (bool is_okay, string reason = "")  {
+        /* Convenient functions */
+
+        private void send_end_session_response (bool is_okay, string reason = "")  {
             return_if_fail (client != null);
 
             // Tell the session manager whether it's okay to logout, shut down, etc.
             try {
                 debug ("Sending is_okay = %s to session manager", is_okay.to_string ());
-                client.EndSessionResponse (true, "");
+                client.EndSessionResponse (is_okay, reason);
             } catch (IOError e) {
                 warning ("Couldn't reply to session manager: %s", e.message);
             }
+        }
+
+        private void terminate_service () {
+            unregister ();
+            stop_service ();
         }
     }
 }

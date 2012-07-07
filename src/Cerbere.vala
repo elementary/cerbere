@@ -38,14 +38,15 @@ public class Cerbere : Application {
     }
 
     private static void log_handler (string? domain, LogLevelFlags level, string message) {
+#if DEBUG
         if (level >= LogLevelFlags.LEVEL_INFO)
             level = LogLevelFlags.LEVEL_MESSAGE;
+#endif
         Log.default_handler (domain, level, message);
     }
 
     protected override void startup () {
         // Try to register Cerbere with the session manager.
-        // This is a non-blocking action.
         register_session_client_async ();
 
         this.settings = new SettingsManager ();
@@ -68,6 +69,7 @@ public class Cerbere : Application {
             this.sm_client.register ();
         } catch (SessionManager.ConnectionError e) {
             critical (e.message);
+            return_if_reached ();
         }
 
         if (this.sm_client != null) {

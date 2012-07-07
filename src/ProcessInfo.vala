@@ -22,7 +22,7 @@
 
 public class ProcessInfo : Object {
 
-    public signal void exited (bool normal_exit);
+    public signal void exited (ProcessInfo process, bool normal_exit);
 
     public enum Status {
         INACTIVE,  // not yet spawned
@@ -31,10 +31,10 @@ public class ProcessInfo : Object {
     }
 
     public uint crash_count { get; private set; default = 0; }
+    public string command { get; private set; default = ""; }
+    public Status status { get; private set; default = Status.INACTIVE; }
 
-    private string command = "";
     private Pid pid = -1;
-    private Status status = Status.INACTIVE;
     private Timer? timer = null;
 
     public ProcessInfo (string command) {
@@ -141,6 +141,6 @@ public class ProcessInfo : Object {
         this.status = Status.TERMINATED;
 
         // Emit signal
-        this.exited (normal_exit);
+        this.exited (this, normal_exit);
     }
 }
