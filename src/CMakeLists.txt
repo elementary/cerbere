@@ -16,6 +16,7 @@ vala_precompile (
   VALA_C
     Cerbere.vala
     SettingsManager.vala
+    SessionManager.vala
     Watchdog.vala
     ProcessInfo.vala
   PACKAGES
@@ -26,6 +27,7 @@ vala_precompile (
     --target-glib=2.32 # Remember to keep this updated.
 )
 
-add_executable(cerbere ${VALA_C})
-target_link_libraries(cerbere ${DEPS_LIBRARIES})
-install(TARGETS cerbere RUNTIME DESTINATION bin)
+set(EXEC_NAME ${CMAKE_PROJECT_NAME})
+add_executable(${EXEC_NAME} ${VALA_C})
+target_link_libraries(${EXEC_NAME} ${DEPS_LIBRARIES})
+install(TARGETS ${EXEC_NAME} RUNTIME DESTINATION bin)
