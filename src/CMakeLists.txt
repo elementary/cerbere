@@ -6,7 +6,10 @@ include(ValaPrecompile)
 
 # pkgconfig, real C code
 find_package(PkgConfig)
-pkg_check_modules(DEPS REQUIRED glib-2.0 gio-2.0 gee-1.0)
+
+set(VALA_DEPS glib-2.0 gio-2.0 gee-1.0)
+
+pkg_check_modules(DEPS REQUIRED ${VALA_DEPS})
 set(CFLAGS ${DEPS_CFLAGS} ${DEPS_CFLAGS_OTHER})
 set(LIB_PATHS ${DEPS_LIBRARY_DIRS})
 link_directories(${LIB_PATHS})
@@ -20,9 +23,7 @@ vala_precompile (
     Watchdog.vala
     ProcessInfo.vala
   PACKAGES
-    glib-2.0
-    gio-2.0
-    gee-1.0
+    ${VALA_DEPS}
   OPTIONS
     --target-glib=2.32 # Remember to keep this updated.
 )
