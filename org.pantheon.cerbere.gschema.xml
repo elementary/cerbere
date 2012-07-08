@@ -2,7 +2,7 @@
 <schemalist>
     <schema path="/org/pantheon/cerbere/" id="org.pantheon.cerbere" gettext-domain="cerbere">
         <key type="as" name="monitored-processes">
-            <default>['wingpanel','plank','/usr/lib/notify-osd/notify-osd','slingshot --silent']</default>
+            <default>['wingpanel','plank','/usr/lib/notify-osd/notify-osd','slingshot-launcher --silent']</default>
             <summary>List of monitored components</summary>
             <description>These applications will be launched and watched by Cerbere, and autorestarted automagically in case they exit</description>
         </key>
