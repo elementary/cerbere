@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Cerbere
 Comment=Pantheon WatchDog
-Icon=reload
+Icon=view-refresh
 Exec=cerbere
 Terminal=false
 Type=Application
