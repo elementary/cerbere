@@ -13,7 +13,7 @@ Copyright: 2012 Victor Eduardo <victoreduardm@gmail.com>
 License: GPL-2.0+
 
 
-Files: cmake/ParseArguments.cmake
+Files: cmake/vala/ParseArguments.cmake
 Copyright: 2000-2009 Kitware, Inc., Insight Software Consortium
 License: 2-clause BSD
 
