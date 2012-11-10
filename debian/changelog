@@ -1,11 +1,5 @@
-cerbere (0.1) quantal; urgency=low
+cerbere (0.1) UNRELEASED; urgency=low
 
-  * Stable Release.
-
- -- Cody Garver <codygarver@imac>  Wed, 11 Jul 2012 22:35:43 -0500
-
-cerbere (0.1) natty; urgency=low
-
-  * Initial Release.
+  * Initial release.
 
  -- Sergey "Shnatsel" Davidoff <shnatsel@gmail.com>  Wed, 29 Jun 2011 02:17:18 +0400

@@ -2,21 +2,22 @@ Source: cerbere
 Section: utils
 Priority: optional
 Maintainer: Sergey "Shnatsel" Davidoff <shnatsel@gmail.com>
-Build-Depends: cmake (>= 2.6),
+Build-Depends: cmake,
                debhelper (>= 7.0.50~),
                libgee-dev (>= 0.5.3),
                libglib2.0-dev (>= 2.28),
-               valac-0.16 | valac (>= 0.16)
+               valac (>= 0.16)
 Standards-Version: 3.8.4
-Vcs-Bzr: lp:cerbere
-Vcs-Browser: https://code.launchpad.net/~elementary-pantheon/cerbere/cerbere
+Homepage: https://launchpad.net/cerbere
 
 Package: cerbere
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
-Description: Pantheon WatchDog
- This package contains a watchdog daemon that launches Pantheon Shell components
- and relaunches them if they crash or get killed.
+Description: service to relaunch Pantheon apps
+ Cerbere is a sort of watchdog designed for Pantheon. It monitors a predefined
+ list of processes (configurable through dconf) and relaunches them if they
+ end. This is helpful to keep the panel, dock, and wallpaper running, even if
+ they crash or are killed by another process.
 
 Package: cerbere-dbg
 Architecture: any
@@ -24,8 +25,10 @@ Section: debug
 Priority: extra
 Depends: cerbere (= ${binary:Version}), ${misc:Depends}
 Enhances: cerbere
-Description: Pantheon WatchDog (debugging symbols)
- This package contains a watchdog daemon that launches Pantheon Shell components
- and relaunches them if they crash or get killed.
+Description: service to relaunch Pantheon apps (debugging symbols)
+ Cerbere is a sort of watchdog designed for Pantheon. It monitors a predefined
+ list of processes (configurable through dconf) and relaunches them if they
+ end. This is helpful to keep the panel, dock, and wallpaper running, even if
+ they crash or are killed by another process.
  .
  This package contains debugging symbols for cerbere.
