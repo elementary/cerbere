@@ -25,13 +25,13 @@
  *          Victor Eduardo <victoreduardm@gmail.com>
  */
 
-public class Watchdog {
+public class Cerbere.Watchdog {
 
     // Contains ALL the processes that are being monitored
-    private Gee.HashMap<string, ProcessInfo> processes;
+    private Gee.HashMap<string, ProcessWrapper> processes;
 
     public Watchdog () {
-        processes = new Gee.HashMap<string, ProcessInfo> ();
+        processes = new Gee.HashMap<string, ProcessWrapper> ();
     }
 
     public void add_process (string command) {
@@ -42,7 +42,7 @@ public class Watchdog {
         if (processes.has_key (command))
             return;
 
-        var process = new ProcessInfo (command);
+        var process = new ProcessWrapper (command);
         processes[command] = process;
 
         process.exited.connect (on_process_exit);
@@ -57,7 +57,7 @@ public class Watchdog {
      * respawned again. Otherwise, it is assumed that the process exited normally and the crash
      * count is reset to 0, which means that only consecutive crashes are counted.
      */
-    private void on_process_exit (ProcessInfo process, bool normal_exit) {
+    private void on_process_exit (ProcessWrapper process, bool normal_exit) {
         if (normal_exit) {
             // Reset crash count. We only want to count consecutive crashes, so that
             // if a normal exit is detected, we reset the counter to 0.
@@ -68,11 +68,11 @@ public class Watchdog {
         string command = process.command;
 
         // if still in the process list, relaunch if possible
-        if (command in Cerbere.settings.process_list) {
+        if (command in App.settings.process_list) {
             // Check if the process is still present in the map since it could have been removed
             if (processes.has_key (command)) {
                 // Check if the process already exceeded the maximum number of allowed crashes.
-                uint max_crashes = Cerbere.settings.max_crashes;
+                uint max_crashes = App.settings.max_crashes;
 
                 if (process.crash_count <= max_crashes) {
                     process.run_async (); // Reload right away

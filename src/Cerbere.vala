@@ -25,11 +25,12 @@
  *          Victor Eduardo <victoreduardm@gmail.com>
  */
 
-public class Cerbere : Application {
+public class Cerbere.App : Application {
 
-    public static SettingsManager settings { get; private set; default = null; }
-    private Watchdog? watchdog = null;
-    private SessionManager.ClientService? sm_client = null;
+    public static SettingsManager settings { get; private set; }
+
+    private Watchdog watchdog;
+    private SessionManager.Client sm_client;
 
     construct {
         application_id = "org.pantheon.cerbere";
@@ -45,7 +46,7 @@ public class Cerbere : Application {
         Log.default_handler (domain, level, message);
     }
 
-    protected override void startup () {
+    public override void startup () {
         // Try to register Cerbere with the session manager.
         register_session_client ();
 
@@ -63,7 +64,7 @@ public class Cerbere : Application {
         if (sm_client != null)
             return;
 
-        sm_client = new SessionManager.ClientService (application_id);
+        sm_client = new SessionManager.Client (application_id);
 
         try {
             sm_client.register ();
@@ -90,7 +91,7 @@ public class Cerbere : Application {
     }
 
     public static int main (string[] args) {
-        var app = new Cerbere ();
+        var app = new Cerbere.App ();
         return app.run (args);
     }
 }

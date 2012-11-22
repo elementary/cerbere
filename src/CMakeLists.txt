@@ -21,7 +21,7 @@ vala_precompile (
     SettingsManager.vala
     SessionManager.vala
     Watchdog.vala
-    ProcessInfo.vala
+    ProcessWrapper.vala
   PACKAGES
     ${VALA_DEPS}
   OPTIONS

@@ -20,13 +20,12 @@
  * Authors: Victor Eduardo <victoreduardm@gmail.com>
  */
 
-namespace SessionManager {
+namespace Cerbere.SessionManager {
 
     public errordomain ConnectionError {
         CONNECTION_FAILED,
         CLIENT_REGISTRATION_FAILED
     }
-
 
     /**
      * GNOME Session Manager DBus API
@@ -34,12 +33,11 @@ namespace SessionManager {
      * API Reference: [[http://www.gnome.org/~mccann/gnome-session/docs/gnome-session.html]]
      * (Consulted on July 4, 2012.)
      */
-
     private const string DBUS_NAME = "org.gnome.SessionManager";
     private const string DBUS_PATH = "/org/gnome/SessionManager";
 
     [DBus (name = "org.gnome.SessionManager")]
-    private interface SessionManager : Object {
+    private interface SessionManagerIface : Object {
         // Many API methods have been left out. Feel free to add them when required.
         public abstract void RegisterClient (string app_id, string client_startup_id,
                                              out ObjectPath client_id) throws IOError;
@@ -47,7 +45,7 @@ namespace SessionManager {
     }
 
     [DBus (name = "org.gnome.SessionManager.ClientPrivate")]
-    private interface ClientPrivate : Object {
+    private interface ClientPrivateIface : Object {
         public abstract void EndSessionResponse (bool is_ok, string reason) throws IOError;
         public signal void QueryEndSession (uint flags);
         public signal void EndSession (uint flags);
@@ -62,16 +60,15 @@ namespace SessionManager {
      * This class handles both the registration of the service,
      * and action requests coming from the session-manager side.
      */
-
-    public class ClientService : Object {
+    public class Client : Object {
         public signal void stop_service ();
 
-        private SessionManager? session_manager = null;
-        private ClientPrivate? client = null;
+        private SessionManagerIface? session_manager = null;
+        private ClientPrivateIface? client = null;
         private ObjectPath? client_id = null;
         public string? app_id { get; private set; default = null; }
 
-        public ClientService (string app_id) {
+        public Client (string app_id) {
             this.app_id = app_id;
         }
 
@@ -81,14 +78,13 @@ namespace SessionManager {
             if (session_manager == null) {
                 connected = connect_session ();
 
-                if (!connected) {
+                if (!connected)
                     throw new ConnectionError.CONNECTION_FAILED ("Could not connect to session manager");
-                }
             }
 
             // NOTE: if you're planning to use this code in other app, pass your app's name
-            //       to register_client() instead of the value of DESKTOP_AUTOSTART_ID,
-            //       unless the app is a desktop component as well (e.g. panel, dock, etc.)
+            // to register_client() instead of the value of DESKTOP_AUTOSTART_ID, unless the
+            // app is a desktop component as well (e.g. panel, dock, etc.)
             string? startup_id = Environment.get_variable ("DESKTOP_AUTOSTART_ID");
 
             if (startup_id == null) {
@@ -165,7 +161,7 @@ namespace SessionManager {
         }
 
 
-        /** ClientPrivate Signal handlers **/
+        /** ClientPrivateIface Signal handlers **/
 
         private void on_client_query_end_session (uint flags) {
             debug ("Client query end session");

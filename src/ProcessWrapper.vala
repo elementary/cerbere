@@ -20,9 +20,9 @@
  * Authors: Victor Eduardo <victoreduardm@gmail.com>
  */
 
-public class ProcessInfo : Object {
+public class Cerbere.ProcessWrapper : Object {
 
-    public signal void exited (ProcessInfo process, bool normal_exit);
+    public signal void exited (ProcessWrapper self, bool normal_exit);
 
     public enum Status {
         INACTIVE,  // not yet spawned
@@ -37,7 +37,7 @@ public class ProcessInfo : Object {
     private Pid pid = -1;
     private Timer? timer = null;
 
-    public ProcessInfo (string command) {
+    public ProcessWrapper (string command) {
         this.command = command;
     }
 
@@ -60,8 +60,7 @@ public class ProcessInfo : Object {
         string[] argvp = null;
         try {
             Shell.parse_argv (this.command, out argvp);
-        }
-        catch (ShellError error) {
+        } catch (ShellError error) {
             warning ("Not passing any args to %s : %s", this.command, error.message);
             argvp = {this.command, null}; // fix value in case it's corrupted
         }
@@ -71,13 +70,12 @@ public class ProcessInfo : Object {
 
         // Spawn process asynchronously
         try {
-            var flags = SpawnFlags.SEARCH_PATH |
-                         SpawnFlags.DO_NOT_REAP_CHILD |
-                         SpawnFlags.STDOUT_TO_DEV_NULL; // discard process output
+            var flags = SpawnFlags.SEARCH_PATH
+                      | SpawnFlags.DO_NOT_REAP_CHILD
+                      | SpawnFlags.STDOUT_TO_DEV_NULL; // discard process output
 
             Process.spawn_async (null, argvp, null, flags, null, out process_id);
-        }
-        catch (Error err) {
+        } catch (Error err) {
             // TODO: Discuss how to handle spawn failures. Currently, Cerbere will give up
             // and stop trying. We could, however, add a call to terminate() in order to let the
             // Watchdog try again.
@@ -120,7 +118,7 @@ public class ProcessInfo : Object {
             this.timer.stop ();
 
             double elapsed_secs = this.timer.elapsed ();
-            double crash_time_interval_secs = (double)Cerbere.settings.crash_time_interval / 1000.0;
+            double crash_time_interval_secs = (double) App.settings.crash_time_interval / 1000.0;
 
             message ("ET = %f secs\tMin allowed time = %f", elapsed_secs, crash_time_interval_secs);
 

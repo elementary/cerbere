@@ -20,7 +20,7 @@
  * Authors: Victor Eduardo <victoreduardm@gmail.com>
  */
 
-public class SettingsManager : Object {
+public class Cerbere.SettingsManager : Object {
 
     public signal void process_list_changed (string[] new_values);
 
@@ -30,8 +30,8 @@ public class SettingsManager : Object {
     static const string CRASH_TIME_INTERVAL_KEY = "crash-time-interval";
     static const string MONITORED_PROCESSES_KEY = "monitored-processes";
 
-    public string[] process_list    { get; set; }
-    public uint max_crashes         { get; set; default = 0; }
+    public string[] process_list { get; set; }
+    public uint max_crashes { get; set; default = 0; }
     public uint crash_time_interval { get; set; default = 0; }
 
     private Settings? settings = null;
