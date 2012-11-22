@@ -47,48 +47,46 @@ public class Cerbere : Application {
 
     protected override void startup () {
         // Try to register Cerbere with the session manager.
-        register_session_client_async ();
+        register_session_client ();
 
-        this.settings = new SettingsManager ();
-        start_processes (this.settings.process_list);
+        settings = new SettingsManager ();
+        start_processes (settings.process_list);
 
         // Monitor changes to the process list
-        this.settings.process_list_changed.connect (this.start_processes);
+        settings.process_list_changed.connect (start_processes);
 
         var main_loop = new MainLoop ();
         main_loop.run ();
     }
 
-    private async void register_session_client_async () {
-        if (this.sm_client != null)
+    private void register_session_client () {
+        if (sm_client != null)
             return;
 
-        this.sm_client = new SessionManager.ClientService (this.application_id);
+        sm_client = new SessionManager.ClientService (application_id);
 
         try {
-            this.sm_client.register ();
+            sm_client.register ();
         } catch (SessionManager.ConnectionError e) {
             critical (e.message);
             return_if_reached ();
         }
 
-        if (this.sm_client != null) {
+        if (sm_client != null) {
             // The session manager may ask us to quit the service, and so we do.
-            this.sm_client.stop_service.connect ( () => {
+            sm_client.stop_service.connect (() => {
                 message ("Exiting...");
-                this.quit_mainloop ();
+                quit_mainloop ();
             });
         }
     }
 
     private void start_processes (string[] process_list) {
-        if (this.watchdog == null) {
-            this.watchdog = new Watchdog ();
-        }
-
-        foreach (string cmd in process_list) {
-            this.watchdog.add_process_async (cmd);
-        }
+        if (watchdog == null)
+            watchdog = new Watchdog ();
+ 
+        foreach (string cmd in process_list)
+            watchdog.add_process (cmd);
     }
 
     public static int main (string[] args) {

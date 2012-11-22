@@ -46,11 +46,7 @@ public class ProcessInfo : Object {
         message ("Crash count of '%s' has been reset", this.command);
     }
 
-    public async void run_async () {
-        this.run ();
-    }
-
-    private void run () {
+    public void run_async () {
         debug ("STARTING process: %s", command);
 
         if (this.status == Status.RUNNING) {

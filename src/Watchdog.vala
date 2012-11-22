@@ -31,84 +31,67 @@ public class Watchdog {
     private Gee.HashMap<string, ProcessInfo> processes;
 
     public Watchdog () {
-        this.processes = new Gee.HashMap<string, ProcessInfo> ();
+        processes = new Gee.HashMap<string, ProcessInfo> ();
     }
 
-    public async void add_process_async (string command) {
-        this.add_process (command);
-    }
-
-    private void add_process (string command) {
-        if (command.strip () == "") // whitespace check
+    public void add_process (string command) {
+        if (command.strip () == "")
             return;
 
         // Check if a process for this command has already been created
-        if (this.processes.has_key (command)) {
+        if (processes.has_key (command))
             return;
-        }
 
-        // Create new process
         var process = new ProcessInfo (command);
+        processes[command] = process;
 
-        // Add it to the table
-        lock (this.processes) {
-            this.processes[command] = process;
-        }
-
-        // Set exit handler
         process.exited.connect (on_process_exit);
 
-        // Run
         process.run_async ();
     }
 
     /**
-     * Exit handler. Respawning occurs here
+     * Process exit handler.
+     *
+     * Respawning occurs here. If the process has crashed more times than max_crashes, it's not
+     * respawned again. Otherwise, it is assumed that the process exited normally and the crash
+     * count is reset to 0, which means that only consecutive crashes are counted.
      */
     private void on_process_exit (ProcessInfo process, bool normal_exit) {
         if (normal_exit) {
             // Reset crash count. We only want to count consecutive crashes, so that
-            // if a normal exit is detected, we should reset the counter.
+            // if a normal exit is detected, we reset the counter to 0.
             process.reset_crash_count ();
         }
 
         bool remove_process = false;
         string command = process.command;
 
-        // if still in the list, relaunch if possible
+        // if still in the process list, relaunch if possible
         if (command in Cerbere.settings.process_list) {
-            // Check if the process is still present in the table since it could have been removed.
+            // Check if the process is still present in the map since it could have been removed
             if (processes.has_key (command)) {
                 // Check if the process already exceeded the maximum number of allowed crashes.
                 uint max_crashes = Cerbere.settings.max_crashes;
 
                 if (process.crash_count <= max_crashes) {
                     process.run_async (); // Reload right away
-                }
-                else {
+                } else {
                     warning ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again", command, max_crashes.to_string ());
                     remove_process = true;
                 }
+            } else {
+                // If a process is not in the map, it means it wasn't re-launched after it exited, so in theory
+                // this code is never reached.
+                critical ("Please file a bug at http://launchpad.net/cerbere and attach your .xsession-errors and .xsession-errors.old files.");
             }
-            else {
-                // If a process is not in the table, it means it wasn't re-launched
-                // after it exited, so in theory this code is never reached.
-                critical ("Please file a bug at http://launchpad.net/cerbere and attach your ~/.xsession-errors file.");
-            }
-        }
-        else {
+        } else {
             warning ("'%s' is no longer in settings (not monitored)", command);
-            process.reset_crash_count (); // reset
+            process.reset_crash_count ();
             remove_process = true;
         }
 
-        // Remove from the table. At this point the reference count should
-        // drop to 0 and free the process info.
-        if (remove_process) {
-            lock (this.processes) {
-                this.processes.unset (command);
-            }
-        }
-
+        if (remove_process)
+            processes.unset (command);
     }
 }
