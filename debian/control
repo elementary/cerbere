@@ -6,7 +6,7 @@ Build-Depends: cmake,
                debhelper (>= 7.0.50~),
                libgee-dev (>= 0.5.3),
                libglib2.0-dev (>= 2.28),
-               valac (>= 0.16)
+               valac-0.16 | valac (>= 0.16)
 Standards-Version: 3.8.4
 Homepage: https://launchpad.net/cerbere
 
