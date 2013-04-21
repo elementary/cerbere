@@ -15,8 +15,9 @@ set(LIB_PATHS ${DEPS_LIBRARY_DIRS})
 link_directories(${LIB_PATHS})
 add_definitions(${CFLAGS})
 
-vala_precompile (
-  VALA_C
+set(EXEC_NAME ${CMAKE_PROJECT_NAME})
+
+vala_precompile(VALA_C ${EXEC_NAME}
     Cerbere.vala
     SettingsManager.vala
     SessionManager.vala
@@ -28,7 +29,6 @@ vala_precompile (
     --target-glib=2.32 # Remember to keep this updated.
 )
 
-set(EXEC_NAME ${CMAKE_PROJECT_NAME})
 add_executable(${EXEC_NAME} ${VALA_C})
 target_link_libraries(${EXEC_NAME} ${DEPS_LIBRARIES})
 install(TARGETS ${EXEC_NAME} RUNTIME DESTINATION bin)

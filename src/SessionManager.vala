@@ -21,7 +21,6 @@
  */
 
 namespace Cerbere.SessionManager {
-
     public errordomain ConnectionError {
         CONNECTION_FAILED,
         CLIENT_REGISTRATION_FAILED
@@ -33,11 +32,9 @@ namespace Cerbere.SessionManager {
      * API Reference: [[http://www.gnome.org/~mccann/gnome-session/docs/gnome-session.html]]
      * (Consulted on July 4, 2012.)
      */
-    private const string DBUS_NAME = "org.gnome.SessionManager";
-    private const string DBUS_PATH = "/org/gnome/SessionManager";
 
     [DBus (name = "org.gnome.SessionManager")]
-    private interface SessionManagerIface : Object {
+    interface SessionManagerIface : Object {
         // Many API methods have been left out. Feel free to add them when required.
         public abstract void RegisterClient (string app_id, string client_startup_id,
                                              out ObjectPath client_id) throws IOError;
@@ -45,14 +42,13 @@ namespace Cerbere.SessionManager {
     }
 
     [DBus (name = "org.gnome.SessionManager.ClientPrivate")]
-    private interface ClientPrivateIface : Object {
+    interface ClientPrivateIface : Object {
         public abstract void EndSessionResponse (bool is_ok, string reason) throws IOError;
         public signal void QueryEndSession (uint flags);
         public signal void EndSession (uint flags);
         public signal void CancelEndSession ();
         public signal void Stop ();
     }
-
 
     /**
      * CLIENT
@@ -61,12 +57,16 @@ namespace Cerbere.SessionManager {
      * and action requests coming from the session-manager side.
      */
     public class Client : Object {
+        private const string DBUS_NAME = "org.gnome.SessionManager";
+        private const string DBUS_PATH = "/org/gnome/SessionManager";
+
         public signal void stop_service ();
+
+        public string? app_id { get; private set; default = null; }
 
         private SessionManagerIface? session_manager = null;
         private ClientPrivateIface? client = null;
         private ObjectPath? client_id = null;
-        public string? app_id { get; private set; default = null; }
 
         public Client (string app_id) {
             this.app_id = app_id;
@@ -128,7 +128,6 @@ namespace Cerbere.SessionManager {
         private bool register_client (string startup_id) {
             return_val_if_fail (session_manager != null && app_id != null, false);
 
-            // Register client
             if (client == null) {
                 try {
                     session_manager.RegisterClient (app_id, startup_id, out client_id);
@@ -140,7 +139,6 @@ namespace Cerbere.SessionManager {
 
                 debug ("Registered session manager client: %s", client_id);
 
-                // Get client
                 try {
                     client = Bus.get_proxy_sync (BusType.SESSION, DBUS_NAME, client_id);
                 } catch (IOError e) {
@@ -150,7 +148,6 @@ namespace Cerbere.SessionManager {
 
                 debug ("Obtained gnome-session client proxy");
 
-                // Connect signals
                 client.QueryEndSession.connect (on_client_query_end_session);
                 client.EndSession.connect (on_client_end_session);
                 client.CancelEndSession.connect (on_client_cancel_end_session);
@@ -161,7 +158,9 @@ namespace Cerbere.SessionManager {
         }
 
 
-        /** ClientPrivateIface Signal handlers **/
+        /**
+         * ClientPrivateIface signal handlers
+         */
 
         private void on_client_query_end_session (uint flags) {
             debug ("Client query end session");
@@ -186,8 +185,6 @@ namespace Cerbere.SessionManager {
             debug ("Client: Received Stop signal");
             terminate_service ();
         }
-
-        /* Convenient functions */
 
         private void send_end_session_response (bool is_okay, string reason = "")  {
             return_if_fail (client != null);

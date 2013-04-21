@@ -26,7 +26,6 @@
  */
 
 public class Cerbere.App : Application {
-
     public static SettingsManager settings { get; private set; }
 
     private Watchdog watchdog;
@@ -56,8 +55,8 @@ public class Cerbere.App : Application {
         // Monitor changes to the process list
         settings.process_list_changed.connect (start_processes);
 
-        var main_loop = new MainLoop ();
-        main_loop.run ();
+        // let's keep running
+        hold ();
     }
 
     private void register_session_client () {
@@ -75,10 +74,7 @@ public class Cerbere.App : Application {
 
         if (sm_client != null) {
             // The session manager may ask us to quit the service, and so we do.
-            sm_client.stop_service.connect (() => {
-                message ("Exiting...");
-                quit_mainloop ();
-            });
+            sm_client.stop_service.connect (quit_service);
         }
     }
 
@@ -88,6 +84,11 @@ public class Cerbere.App : Application {
  
         foreach (string cmd in process_list)
             watchdog.add_process (cmd);
+    }
+
+    private void quit_service () {
+        message ("Closing Cerbere as requested by SessionManager");
+        release ();
     }
 
     public static int main (string[] args) {
