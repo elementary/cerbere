@@ -34,18 +34,11 @@ public class Cerbere.App : Application {
     construct {
         application_id = "org.pantheon.cerbere";
         flags = ApplicationFlags.IS_SERVICE;
-        Log.set_handler (null, LogLevelFlags.LEVEL_MASK, log_handler);
-    }
-
-    private static void log_handler (string? domain, LogLevelFlags level, string message) {
-#if DEBUG
-        if (level >= LogLevelFlags.LEVEL_INFO)
-            level = LogLevelFlags.LEVEL_MESSAGE;
-#endif
-        Log.default_handler (domain, level, message);
     }
 
     public override void startup () {
+        base.startup ();
+
         // Try to register Cerbere with the session manager.
         register_session_client ();
 
