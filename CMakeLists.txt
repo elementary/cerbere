@@ -6,6 +6,7 @@ cmake_policy(VERSION 2.6)
 project(cerbere)
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/vala)
 
 # Add 'make dist' command for creating release tarball
 set (CPACK_PACKAGE_VERSION ${VERSION})
