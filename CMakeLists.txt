@@ -8,6 +8,8 @@ project(cerbere)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake)
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/vala)
 
+set (VERSION "0.2")
+
 # Add 'make dist' command for creating release tarball
 set (CPACK_PACKAGE_VERSION ${VERSION})
 set (CPACK_SOURCE_GENERATOR "TGZ")
