@@ -1,5 +1,4 @@
 Dependencies:
-    debhelper (>= 7.0.50~)
     cmake (>= 2.6)
     libglib2.0-dev (>= 2.32)
     valac (>= 0.16)
