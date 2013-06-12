@@ -7,7 +7,7 @@ Build-Depends: cmake,
                libgee-dev (>= 0.5.3),
                libglib2.0-dev (>= 2.28),
                valac-0.16 | valac (>= 0.16)
-Standards-Version: 3.8.4
+Standards-Version: 3.9.3
 Homepage: https://launchpad.net/cerbere
 
 Package: cerbere

@@ -1,3 +1,9 @@
+cerbere (0.2) precise; urgency=low
+
+  * New upstream release.
+
+ -- Cody Garver <cody@elementaryos.org>  Wed, 12 Jun 2013 13:21:42 -0500
+
 cerbere (0.1) UNRELEASED; urgency=low
 
   * Initial release.
