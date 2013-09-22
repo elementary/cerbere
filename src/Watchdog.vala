@@ -75,11 +75,11 @@ public class Cerbere.Watchdog {
             } else {
                 uint max_crashes = App.settings.max_crashes;
 
-                if (process.crash_count <= max_crashes) {
-                    process.run_async ();
-                } else {
+                if (process.crash_count > max_crashes) {
                     warning ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again", command, max_crashes.to_string ());
                     remove_process = true;
+                } else {
+                    process.run_async ();
                 }
             }
         }
