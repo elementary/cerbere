@@ -40,9 +40,7 @@ public class Cerbere.Watchdog {
 
         var process = new ProcessWrapper (command);
         processes[command] = process;
-
         process.exited.connect (on_process_exit);
-
         process.run_async ();
     }
 
