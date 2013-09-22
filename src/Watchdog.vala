@@ -62,13 +62,12 @@ public class Cerbere.Watchdog {
         if (normal_exit)
             process.reset_crash_count ();
 
-        bool remove_process = false;
         string command = process.command;
 
         if ((command in App.settings.process_list) == false) {
             warning ("'%s' is no longer in settings (not monitored)", command);
             process.reset_crash_count ();
-            remove_process = true;
+            processes.unset (command);
         } else {
             if (processes.has_key (command) == false) {
                 critical ("Please file a bug at http://launchpad.net/cerbere and attach your .xsession-errors and .xsession-errors.old files.");
@@ -77,14 +76,11 @@ public class Cerbere.Watchdog {
 
                 if (process.crash_count > max_crashes) {
                     warning ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again", command, max_crashes.to_string ());
-                    remove_process = true;
+                    processes.unset (command);
                 } else {
                     process.run_async ();
                 }
             }
         }
-
-        if (remove_process)
-            processes.unset (command);
     }
 }
