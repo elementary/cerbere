@@ -59,11 +59,8 @@ public class Cerbere.Watchdog {
      * that only consecutive crashes are counted.
      */
     private void on_process_exit (ProcessWrapper process, bool normal_exit) {
-        if (normal_exit) {
-            // Reset crash count. We only want to count consecutive crashes, so that
-            // if a normal exit is detected, we reset the counter to 0.
+        if (normal_exit)
             process.reset_crash_count ();
-        }
 
         bool remove_process = false;
         string command = process.command;
