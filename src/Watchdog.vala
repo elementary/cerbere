@@ -35,7 +35,7 @@ public class Cerbere.Watchdog {
     }
 
     public void add_process (string command) {
-        if (command.strip () == "")
+        if (is_valid_command (command) == false)
             return;
 
         // Check if a process for this command has already been created
@@ -48,6 +48,10 @@ public class Cerbere.Watchdog {
         process.exited.connect (on_process_exit);
 
         process.run_async ();
+    }
+
+    bool is_valid_command (string command) {
+        return command.strip () != "";
     }
 
     /**
