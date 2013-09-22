@@ -72,14 +72,18 @@ public class Cerbere.Watchdog {
         }
         
         if (processes.has_key (command) == false) {
-            critical ("Please file a bug at http://launchpad.net/cerbere and attach your .xsession-errors and .xsession-errors.old files.");
+            critical ("Please file a bug at http://launchpad.net/cerbere and" +
+                      " attach your .xsession-errors and .xsession-errors.old" +
+                      " files.");
             return;
         }
         
         uint max_crashes = App.settings.max_crashes;
 
         if (process.crash_count > max_crashes) {
-            warning ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again", command, max_crashes.to_string ());
+            warning ("'%s' exceeded the maximum number of crashes allowed " +
+                     "(%s). It won't be launched again",
+                     command, max_crashes.to_string ());
             processes.unset (command);
             return;
         }
