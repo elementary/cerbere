@@ -65,22 +65,17 @@ public class Cerbere.Watchdog {
         bool remove_process = false;
         string command = process.command;
 
-        // if still in the process list, relaunch if possible
         if (command in App.settings.process_list) {
-            // Check if the process is still present in the map since it could have been removed
             if (processes.has_key (command)) {
-                // Check if the process already exceeded the maximum number of allowed crashes.
                 uint max_crashes = App.settings.max_crashes;
 
                 if (process.crash_count <= max_crashes) {
-                    process.run_async (); // Reload right away
+                    process.run_async ();
                 } else {
                     warning ("'%s' exceeded the maximum number of crashes allowed (%s). It won't be launched again", command, max_crashes.to_string ());
                     remove_process = true;
                 }
             } else {
-                // If a process is not in the map, it means it wasn't re-launched after it exited, so in theory
-                // this code is never reached.
                 critical ("Please file a bug at http://launchpad.net/cerbere and attach your .xsession-errors and .xsession-errors.old files.");
             }
         } else {
