@@ -53,11 +53,10 @@ public class Cerbere.Watchdog {
     }
 
     /**
-     * Process exit handler.
-     *
-     * Respawning occurs here. If the process has crashed more times than max_crashes, it's not
-     * respawned again. Otherwise, it is assumed that the process exited normally and the crash
-     * count is reset to 0, which means that only consecutive crashes are counted.
+     * Respawning occurs here. If the process has crashed more times than
+     * max_crashes, it's not respawned again. Otherwise, it is assumed that the
+     * process exited normally and the crash count is reset to 0, which means
+     * that only consecutive crashes are counted.
      */
     private void on_process_exit (ProcessWrapper process, bool normal_exit) {
         if (normal_exit) {
