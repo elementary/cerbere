@@ -34,13 +34,9 @@ public class Cerbere.Watchdog {
         processes = new Gee.HashMap<string, ProcessWrapper> ();
     }
 
-    public void add_process (string command) {
-        if (is_valid_command (command) == false)
-            return;
-
-        // Check if a process for this command has already been created
-        if (is_new_command (command) == false)
-            return;
+    public void add_process (string command)
+        requires (is_valid_command (command))
+        requires (is_new_command (command)) {
 
         var process = new ProcessWrapper (command);
         processes[command] = process;
