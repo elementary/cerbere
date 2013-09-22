@@ -39,7 +39,7 @@ public class Cerbere.Watchdog {
             return;
 
         // Check if a process for this command has already been created
-        if (processes.has_key (command))
+        if (is_new_command (command) == false)
             return;
 
         var process = new ProcessWrapper (command);
@@ -52,6 +52,10 @@ public class Cerbere.Watchdog {
 
     bool is_valid_command (string command) {
         return command.strip () != "";
+    }
+
+    bool is_new_command (string command) {
+        return processes.has_key (command) == false;
     }
 
     /**
