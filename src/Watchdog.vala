@@ -42,10 +42,7 @@ public class Cerbere.Watchdog {
             return;
         }
         
-        var process = new ProcessWrapper (command);
-        processes[command] = process;
-        process.exited.connect (on_process_exit);
-        process.run_async ();
+        monitor_and_run_command (command);
     }
 
     bool is_valid_command (string command) {
@@ -54,6 +51,13 @@ public class Cerbere.Watchdog {
 
     bool is_new_command (string command) {
         return !processes.has_key (command);
+    }
+    
+    void monitor_and_run_command (string command) {
+        var process = new ProcessWrapper (command);
+        processes[command] = process;
+        process.exited.connect (on_process_exit);
+        process.run_async ();
     }
 
     /**
