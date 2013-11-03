@@ -37,7 +37,7 @@ public class Cerbere.Watchdog {
     public void add_process (string command)
         requires (is_valid_command (command)) {
         
-        if (!is_new_command (command)) {
+        if (command_is_monitored (command)) {
             warning ("Command '%s' is already being monitored.", command);
             return;
         }
@@ -49,8 +49,8 @@ public class Cerbere.Watchdog {
         return command.strip () != "";
     }
 
-    bool is_new_command (string command) {
-        return !processes.has_key (command);
+    bool command_is_monitored (string command) {
+        return processes.has_key (command);
     }
     
     void monitor_and_run_command (string command) {
@@ -79,7 +79,7 @@ public class Cerbere.Watchdog {
             return;
         }
 
-        if (is_new_command (command)) {
+        if (!command_is_monitored (command)) {
             critical ("Please file a bug at http://launchpad.net/cerbere and " +
                       "attach your .xsession-errors and .xsession-errors.old " +
                       "files.");
