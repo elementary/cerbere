@@ -71,7 +71,7 @@ public class Cerbere.Watchdog {
             return;
         }
 
-        if (processes.has_key (command) == false) {
+        if (is_new_command (command)) {
             critical ("Please file a bug at http://launchpad.net/cerbere and " +
                       "attach your .xsession-errors and .xsession-errors.old " +
                       "files.");
