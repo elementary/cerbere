@@ -35,9 +35,13 @@ public class Cerbere.Watchdog {
     }
 
     public void add_process (string command)
-        requires (is_valid_command (command))
-        requires (is_new_command (command)) {
-
+        requires (is_valid_command (command)) {
+        
+        if (!is_new_command (command)) {
+            warning ("Command '%s' is already being monitored.", command);
+            return;
+        }
+        
         var process = new ProcessWrapper (command);
         processes[command] = process;
         process.exited.connect (on_process_exit);
