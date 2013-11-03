@@ -67,7 +67,7 @@ public class Cerbere.Watchdog {
         if (is_not_in_settings (command)) {
             warning ("'%s' is no longer in settings (not monitored)", command);
             process.reset_crash_count ();
-            processes.unset (command);
+            unmonitor_command (command);
             return;
         }
 
@@ -84,7 +84,7 @@ public class Cerbere.Watchdog {
             warning ("'%s' exceeded the maximum number of crashes allowed " +
                      "(%s). It won't be launched again",
                      command, max_crashes.to_string ());
-            processes.unset (command);
+            unmonitor_command (command);
             return;
         }
 
@@ -93,5 +93,9 @@ public class Cerbere.Watchdog {
     
     bool is_not_in_settings (string command) {
         return (command in App.settings.process_list) == false;
+    }
+    
+    void unmonitor_command (string command) {
+        processes.unset (command);
     }
 }
