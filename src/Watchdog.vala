@@ -45,15 +45,15 @@ public class Cerbere.Watchdog {
         monitor_and_run_command (command);
     }
 
-    bool is_valid_command (string command) {
+    private bool is_valid_command (string command) {
         return command.strip () != "";
     }
 
-    bool command_is_monitored (string command) {
+    private bool command_is_monitored (string command) {
         return processes.has_key (command);
     }
     
-    void monitor_and_run_command (string command) {
+    private void monitor_and_run_command (string command) {
         var process = new ProcessWrapper (command);
         processes[command] = process;
         process.exited.connect (on_process_exit);
@@ -98,11 +98,11 @@ public class Cerbere.Watchdog {
         process.run_async ();
     }
     
-    bool is_not_in_settings (string command) {
+    private bool is_not_in_settings (string command) {
         return !(command in App.settings.process_list);
     }
     
-    void unmonitor_command (string command) {
+    private void unmonitor_command (string command) {
         processes.unset (command);
     }
 }
