@@ -1,0 +1,25 @@
+.TH contractor 1 "May 28, 2014"
+.SH NAME
+contractor \- service to relaunch shell components
+.PP
+\fBcerbere\fP  Cerbere is a sort of watchdog designed for Pantheon.
+It monitors a predefined list of processes (configurable through GSettings)
+and relaunches them if they end. 
+This is helpful to keep the panel, dock, and wallpaper running, even if
+they crash or are killed by another process.
+.SH SYNOPSIS
+.B cerbere
+.SH CONFIGURATION
+.PP
+The list of commands to launch and monitor is stored in GSettings. See
+.I /usr/share/glib-2.0/schemas/org.pantheon.cerbere.gschema.xml
+for exact paths.
+.SH AUTHOR
+cerbere was written by Allen Lowe <lallenlowe@gmail.com>,
+ammonkey <am.monkeyd@gmail.com>,
+Lucas Baudin <xapantu@gmail.com>,
+Victor Martinez <victor@elementaryos.org>,
+Julien Spautz <spautz.julien@gmail.com>.
+.PP
+This manual page was written by Sergey "Shnatsel" Davidoff <sergey@elementaryos.org>,
+for the Debian project (but may be used by others).
