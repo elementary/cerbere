@@ -1,21 +1,21 @@
 Source: cerbere
 Section: utils
 Priority: optional
-Maintainer: Sergey "Shnatsel" Davidoff <shnatsel@gmail.com>
-Build-Depends: cmake,
-               debhelper (>= 7.0.50~),
+Maintainer: Sergey "Shnatsel" Davidoff <sergey@elementaryos.org>
+Build-Depends: cmake (>= 2.6),
+               debhelper (>= 9),
                libgee-0.8-dev (>= 0.5.3),
                libglib2.0-dev (>= 2.28),
                valac (>= 0.16)
-Standards-Version: 3.9.3
+Standards-Version: 3.9.5
 Homepage: https://launchpad.net/cerbere
 
 Package: cerbere
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
-Description: service to relaunch Pantheon apps
+Description: service to relaunch Pantheon shell components
  Cerbere is a sort of watchdog designed for Pantheon. It monitors a predefined
- list of processes (configurable through dconf) and relaunches them if they
+ list of processes (configurable through GSettings) and relaunches them if they
  end. This is helpful to keep the panel, dock, and wallpaper running, even if
  they crash or are killed by another process.
 
@@ -25,9 +25,9 @@ Section: debug
 Priority: extra
 Depends: cerbere (= ${binary:Version}), ${misc:Depends}
 Enhances: cerbere
-Description: service to relaunch Pantheon apps (debugging symbols)
+Description: service to relaunch Pantheon shell components (debugging symbols)
  Cerbere is a sort of watchdog designed for Pantheon. It monitors a predefined
- list of processes (configurable through dconf) and relaunches them if they
+ list of processes (configurable through GSettings) and relaunches them if they
  end. This is helpful to keep the panel, dock, and wallpaper running, even if
  they crash or are killed by another process.
  .
