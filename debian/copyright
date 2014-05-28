@@ -4,12 +4,16 @@ Source: https://launchpad.net/cerbere
 
 
 Files: *
-Copyright: 2011-2012 Allen Lowe
+Copyright: 2011-2012 Allen Lowe <lallenlowe@gmail.com>
+           2011 ammonkey <am.monkeyd@gmail.com>
+           2011 Lucas Baudin <xapantu@gmail.com>
+           2012-2013 Victor Martinez <victor@elementaryos.org>
+           2013 Julien Spautz <spautz.julien@gmail.com>
 License: GPL-2.0+
 
 
 Files: src/ProcessInfo.vala src/SettingsManager.vala src/SessionManager.vala
-Copyright: 2012 Victor Eduardo <victoreduardm@gmail.com>
+Copyright: 2012-2013 Victor Martinez <victor@elementaryos.org>
 License: GPL-2.0+
 
 
