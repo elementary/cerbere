@@ -24,7 +24,7 @@ public class Cerbere.SettingsManager : Object {
 
     public signal void process_list_changed (string[] new_values);
 
-    static const string SETTINGS_PATH = "org.pantheon.cerbere";
+    static const string SETTINGS_PATH = "org.pantheon.desktop.cerbere";
 
     static const string MAX_CRASHES_KEY = "max-crashes";
     static const string CRASH_TIME_INTERVAL_KEY = "crash-time-interval";
