@@ -21,7 +21,3 @@ add_custom_target (dist COMMAND ${CMAKE_MAKE_PROGRAM} package_source)
 
 add_subdirectory (src)
 add_subdirectory (data)
-
-# GSettings schema
-include(GSettings)
-add_schema("org.pantheon.cerbere.gschema.xml")
