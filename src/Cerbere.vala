@@ -32,7 +32,7 @@ public class Cerbere.App : Application {
     private SessionManager.Client sm_client;
 
     construct {
-        application_id = "org.pantheon.cerbere";
+        application_id = "io.elementary.cerbere";
         flags = ApplicationFlags.IS_SERVICE;
     }
 
