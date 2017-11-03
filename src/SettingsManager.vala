@@ -24,11 +24,11 @@ public class Cerbere.SettingsManager : Object {
 
     public signal void process_list_changed (string[] new_values);
 
-    static const string SETTINGS_PATH = "org.pantheon.desktop.cerbere";
+    const string SETTINGS_PATH = "org.pantheon.desktop.cerbere";
 
-    static const string MAX_CRASHES_KEY = "max-crashes";
-    static const string CRASH_TIME_INTERVAL_KEY = "crash-time-interval";
-    static const string MONITORED_PROCESSES_KEY = "monitored-processes";
+    const string MAX_CRASHES_KEY = "max-crashes";
+    const string CRASH_TIME_INTERVAL_KEY = "crash-time-interval";
+    const string MONITORED_PROCESSES_KEY = "monitored-processes";
 
     public string[] process_list { get; set; }
     public uint max_crashes { get; set; default = 0; }
