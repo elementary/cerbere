@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-    <schema path="/io/elementary/desktop/cerbere/" id="io.elementary.desktop.cerbere" gettext-domain="cerbere">
+    <schema path="/io/elementary/desktop/cerbere/" id="io.elementary.desktop.cerbere">
         <key type="as" name="monitored-processes">
             <default>['wingpanel','plank']</default>
             <summary>List of monitored components</summary>
