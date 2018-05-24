@@ -1,5 +1,5 @@
 project(
-    'cerbere',
+    'io.elementary.cerbere',
     'vala', 'c',
     version: '0.2.2'
 )

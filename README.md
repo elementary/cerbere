@@ -15,7 +15,7 @@ Run `meson` to configure the build environment and then `ninja` to build
     cd build
     ninja
 
-To install, use `ninja install`, then execute with `cerbere`
+To install, use `ninja install`, then execute with `io.elementary.cerbere`
 
     sudo ninja install
-    cerbere
+    io.elementary.cerbere

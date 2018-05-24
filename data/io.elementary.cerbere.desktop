@@ -2,7 +2,7 @@
 Name=Cerbere
 Comment=Pantheon WatchDog
 Icon=view-refresh
-Exec=cerbere
+Exec=io.elementary.cerbere
 Terminal=false
 Type=Application
 Categories=System;
