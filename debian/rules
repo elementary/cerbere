@@ -1,10 +1,10 @@
 #!/usr/bin/make -f
 
 %:
-	dh $@ 
+	dh $@ --buildsystem=meson
+
+override_dh_missing:
+	dh_missing --fail-missing --list-missing
 
 override_dh_strip:
-	dh_strip --dbg-package=cerbere-dbg
-
-override_dh_auto_install:
-	dh_auto_install --destdir=debian/cerbere
+	dh_strip -p io.elementary.cerbere --dbgsym-migration='cerbere-dbg (<< 0.2.2)'
