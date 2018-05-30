@@ -1,8 +1,8 @@
-io.elementary.cerbere (0.2.3) UNRELEASED; urgency=medium
+io.elementary.cerbere (0.2.3) bionic; urgency=medium
 
-  * Pre-release version bump.
+  * New upstream release.
 
- -- Cody Garver <cody@elementary.io>  Thu, 24 May 2018 11:02:20 -0500
+ -- Cody Garver <cody@elementary.io>  Wed, 30 May 2018 17:23:57 -0500
 
 io.elementary.cerbere (0.2.2) xenial; urgency=medium
 
