@@ -1,7 +1,7 @@
 project(
     'io.elementary.cerbere',
     'vala', 'c',
-    version: '0.2.2'
+    version: '0.2.3'
 )
 
 subdir('data')
