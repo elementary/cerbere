@@ -85,6 +85,7 @@ public class Cerbere.App : Application {
     }
 
     public static int main (string[] args) {
+        Gdk.init (ref args);
         var app = new Cerbere.App ();
         return app.run (args);
     }
