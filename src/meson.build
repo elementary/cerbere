@@ -1,3 +1,5 @@
+install_path = join_paths(get_option('prefix'), get_option('libexecdir'))
+
 files = files(
     'Cerbere.vala',
     'ProcessWrapper.vala',
@@ -11,7 +13,8 @@ dependencies = [
     dependency('gio-2.0'),
     dependency('glib-2.0'),
     meson.get_compiler('vala').find_library('posix'),
-    meson.get_compiler('c').find_library('m', required : false)
+    meson.get_compiler('c').find_library('m', required : false),
+    install_dir: install_path
 ]
 
 executable(
