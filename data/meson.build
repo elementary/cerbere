@@ -5,5 +5,5 @@ install_data(
 
 install_data(
     meson.project_name() + '.desktop',
-    install_dir: join_paths(get_option('datadir'), 'applications')
+    install_dir: join_paths(get_option('sysconfdir'), 'xdg', 'autostart')
 )
