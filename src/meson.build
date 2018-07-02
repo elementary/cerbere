@@ -1,5 +1,3 @@
-install_path = join_paths(get_option('prefix'), get_option('libexecdir'))
-
 files = files(
     'Cerbere.vala',
     'ProcessWrapper.vala',

@@ -1,5 +1,5 @@
 desktop_config = configuration_data()
-desktop_config.set('EXEC_PATH', join_paths(get_option('prefix'), get_option('libexecdir'), meson.project_name())
+desktop_config.set('EXEC_PATH', join_paths(install_path, meson.project_name()))
 configure_file (
     input: meson.project_name() + '.desktop.in',
     output: meson.project_name() + 'desktop',
