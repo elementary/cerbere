@@ -12,12 +12,12 @@ dependencies = [
     dependency('glib-2.0'),
     meson.get_compiler('vala').find_library('posix'),
     meson.get_compiler('c').find_library('m', required : false),
-    install_dir: install_path
 ]
 
 executable(
     meson.project_name(),
     files,
     dependencies: dependencies,
-    install: true
+    install: true,
+    install_dir: install_path
 )
