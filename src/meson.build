@@ -18,5 +18,6 @@ executable(
     meson.project_name(),
     files,
     dependencies: dependencies,
-    install: true
+    install: true,
+    install_dir: install_path
 )
