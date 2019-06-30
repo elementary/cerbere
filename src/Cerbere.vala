@@ -68,6 +68,8 @@ public class Cerbere.App : Application {
         if (sm_client != null) {
             // The session manager may ask us to quit the service, and so we do.
             sm_client.stop_service.connect (quit_service);
+            // Cleanly shutdown when receiving SIGTERM.
+            Posix.signal (Posix.Signal.TERM, handle_sigterm);
         }
     }
 
@@ -81,6 +83,11 @@ public class Cerbere.App : Application {
 
     private void quit_service () {
         message ("Closing Cerbere as requested by SessionManager");
+        release ();
+    }
+
+    private void handle_sigterm () {
+        message ("Closing Cerbere as requested via SIGTERM");
         release ();
     }
 
