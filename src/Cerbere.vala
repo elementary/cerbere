@@ -68,15 +68,16 @@ public class Cerbere.App : Application {
         if (sm_client != null) {
             // The session manager may ask us to quit the service, and so we do.
             sm_client.stop_service.connect (quit_service);
-            // Cleanly shutdown when receiving SIGTERM.
+            // Cleanly shutdown when receiving SIGTERM or SIGHUP.
             Posix.signal (Posix.Signal.TERM, handle_sigterm);
+            Posix.signal (Posix.Signal.HUP, handle_sighup);
         }
     }
 
     private void start_processes (string[] process_list) {
         if (watchdog == null)
             watchdog = new Watchdog ();
- 
+
         foreach (string cmd in process_list)
             watchdog.add_process (cmd);
     }
@@ -88,6 +89,11 @@ public class Cerbere.App : Application {
 
     private void handle_sigterm () {
         message ("Closing Cerbere as requested via SIGTERM");
+        release ();
+    }
+
+    private void handle_sighup () {
+        message ("Closing Cerbere as requested via SIGHUP");
         release ();
     }
 
