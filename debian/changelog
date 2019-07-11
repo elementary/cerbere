@@ -1,3 +1,9 @@
+io.elementary.cerbere (2.5.0) bionic; urgency=medium
+
+  * New upstream release.
+
+ -- Cody Garver <codygarver@gmail.com>  Thu, 11 Jul 2019 09:21:02 -0500
+
 io.elementary.cerbere (0.2.4) bionic; urgency=medium
 
   * New upstream release.
