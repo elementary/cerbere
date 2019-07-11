@@ -1,7 +1,7 @@
 project(
     'io.elementary.cerbere',
     'vala', 'c',
-    version: '0.2.4'
+    version: '2.5.0'
 )
 
 install_path = join_paths(get_option('prefix'), get_option('libexecdir'))
