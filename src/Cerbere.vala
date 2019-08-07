@@ -28,6 +28,7 @@
 public class Cerbere.App : Application {
     public static SettingsManager settings { get; private set; }
 
+    private static int ref_count = 0;
     private Watchdog watchdog;
     private SessionManager.Client sm_client;
 
@@ -50,6 +51,7 @@ public class Cerbere.App : Application {
 
         // let's keep running
         hold ();
+        GLib.AtomicInt.inc (ref ref_count);
     }
 
     private void register_session_client () {
@@ -82,19 +84,23 @@ public class Cerbere.App : Application {
             watchdog.add_process (cmd);
     }
 
+    private void stop_service (string requestor) {
+        if (GLib.AtomicInt.dec_and_test (ref ref_count)) {
+            message (@"Closing Cerbere as requested by $requestor");
+            release ();
+        }
+    }
+
     private void quit_service () {
-        message ("Closing Cerbere as requested by SessionManager");
-        release ();
+        stop_service ("SessionManager");
     }
 
     private void handle_sigterm () {
-        message ("Closing Cerbere as requested via SIGTERM");
-        release ();
+        stop_service ("SIGTERM");
     }
 
     private void handle_sighup () {
-        message ("Closing Cerbere as requested via SIGHUP");
-        release ();
+        stop_service ("SIGHUP");
     }
 
     public static int main (string[] args) {
