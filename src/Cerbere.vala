@@ -86,14 +86,14 @@ public class Cerbere.App : Application {
         release ();
     }
 
-    private void handle_sigterm () {
+    private static void handle_sigterm (int sig) {
         message ("Closing Cerbere as requested via SIGTERM");
-        release ();
+        GLib.Application.get_default ().release ();
     }
 
-    private void handle_sighup () {
+    private static void handle_sighup (int sig) {
         message ("Closing Cerbere as requested via SIGHUP");
-        release ();
+        GLib.Application.get_default ().release ();
     }
 
     public static int main (string[] args) {
