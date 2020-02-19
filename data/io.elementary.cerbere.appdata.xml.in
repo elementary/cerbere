@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Copyright 2015-2020 elementary, Inc. <contact@elementary.io> -->
-<component type="desktop-application">
+<component type="service">
   <id>io.elementary.cerbere</id>
   <metadata_license>CC0-1.0</metadata_license>
   <project_group>elementary</project_group>
@@ -39,7 +39,6 @@
   <provides>
     <binary>cerbere</binary>
   </provides>
-  <compulsory_for_desktop>Pantheon</compulsory_for_desktop>
   <developer_name>elementary, Inc.</developer_name>
   <url type="homepage">https://elementary.io/</url>
   <url type="bugtracker">https://github.com/elementary/cerbere/issues</url>
