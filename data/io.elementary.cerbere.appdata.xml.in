@@ -11,6 +11,11 @@
     <p>A simple service to ensure uptime of essential processes</p>
   </description>
   <releases>
+    <release version="2.5.1" date="2020-02-25" urgency="medium">
+      <description>
+        <p>Remove all components from autostart as they are now handled by GNOME Session. Cerbere is going into maintainence mode!</p>
+      </description>
+    </release>
     <release version="2.5.0" date="2019-07-11" urgency="medium">
       <description>
         <p>Changes:</p>
