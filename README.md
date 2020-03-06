@@ -1,5 +1,8 @@
 # Cerbere
 
+# THIS COMPONENT HAS BEEN RETIRED
+It no longer serves a function in Pantheon.
+
 ## Building and Installation
 
 You'll need the following dependencies:
