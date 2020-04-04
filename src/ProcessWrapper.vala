@@ -26,6 +26,7 @@ public class Cerbere.ProcessWrapper : Object {
 
     public enum Status {
         INACTIVE,  // not yet spawned
+        STARTING,   // active (already spawned)
         RUNNING,   // active (already spawned)
         TERMINATED // killed/exited
     }
@@ -49,47 +50,35 @@ public class Cerbere.ProcessWrapper : Object {
     public void run_async () {
         debug ("STARTING process: %s", command);
 
-        if (this.status == Status.RUNNING) {
+        if (status == Status.RUNNING || status == Status.STARTING) {
             warning ("Process %s is already running. Not starting it again...", command);
             return;
         }
 
-        Pid process_id = -1;
+        var default_display = Gdk.Display.get_default ();
+        var launch_context = default_display.get_app_launch_context ();
 
-        // parse args
-        string[] argvp = null;
+        launch_context.launched.connect ((info, platform_data) => {
+            // time starts counting here
+            timer = new Timer ();
+            platform_data.lookup ("pid", "i", out pid);
+            status = Status.RUNNING;
+
+            // Add watch
+            ChildWatch.add (pid, on_process_watch_exit);
+        });
+
+       launch_context.launch_failed.connect (() => {
+            status = Status.TERMINATED;
+       });
+
         try {
-            Shell.parse_argv (this.command, out argvp);
-        } catch (ShellError error) {
-            warning ("Not passing any args to %s : %s", this.command, error.message);
-            argvp = {this.command, null}; // fix value in case it's corrupted
+            var appinfo = GLib.AppInfo.create_from_commandline (command, null, GLib.AppInfoCreateFlags.NONE);
+            appinfo.launch (null, launch_context);
+            status = Status.STARTING;
+        } catch (Error e) {
+            critical (e.message);
         }
-
-        if (argvp == null)
-            return;
-
-        // Spawn process asynchronously
-        try {
-            var flags = SpawnFlags.SEARCH_PATH
-                      | SpawnFlags.DO_NOT_REAP_CHILD
-                      | SpawnFlags.STDOUT_TO_DEV_NULL; // discard process output
-
-            Process.spawn_async (null, argvp, null, flags, null, out process_id);
-        } catch (Error err) {
-            // TODO: Discuss how to handle spawn failures. Currently, Cerbere will give up
-            // and stop trying. We could, however, add a call to terminate() in order to let the
-            // Watchdog try again.
-            warning (err.message);
-            return;
-        }
-
-        // time starts counting here
-        this.timer = new Timer ();
-        this.status = Status.RUNNING;
-        this.pid = process_id;
-
-        // Add watch
-        ChildWatch.add (this.pid, this.on_process_watch_exit);
     }
 
     private void on_process_watch_exit (Pid pid, int status) {
